@@ -2,6 +2,7 @@
   "name": "HomeHue",
   "version": "0.0.1",
   "devDependencies": {
+    "express": "*",
     "grunt": "*",
     "grunt-cli": "*",
     "grunt-contrib-jshint": "*",

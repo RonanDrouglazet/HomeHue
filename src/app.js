@@ -1,15 +1,20 @@
 (function(){
 
+    /**
+     * Class HomeHue
+     * Main app
+     */
+
     var HomeHue = function() {
         this.hueIp = "http://192.168.1.12/";
-        this.hueUser = "newdeveloper";
+        this.hueUser = "homehueappjs";
         this.template = {};
         this.box = {};
 
         this.HUE_CONST = {
             API: "api/",
             LIGHTS: "/lights/",
-            STATE: "state/"
+            STATE: "/state"
         };
     };
 
@@ -25,8 +30,8 @@
     HomeHue.prototype.getTemplate = function() {
         try{
             this.template = {
-                box: document.getElementsByClassName("HHbox")[0],
-                boxName: null
+                box: document.getElementsByClassName("HHBox")[0],
+                boxOnOff: null
             };
 
             this.template.box.parentNode.removeChild(this.template.box);
@@ -45,10 +50,16 @@
     HomeHue.prototype.domUpdateHue = function(hue) {
         for (var lightId in hue) {
             if (hue.hasOwnProperty(lightId) && !this.box[hue[lightId].name]) {
-                var box = this.box[hue[lightId].name] = new Box(hue[lightId].name, this.template);
+                var box = this.box[hue[lightId].name] = new Box(hue[lightId].name, lightId, this);
                 box.append(document.body);
             }
         }
+    };
+
+    HomeHue.prototype.setHueOnOff = function() {
+        this.app.set(this.setOnOff.bind(this, !this.getOnOff()), this.id, {
+            "on": !this.getOnOff()
+        });
     };
 
     HomeHue.prototype.get = function(callback, light) {
@@ -56,18 +67,23 @@
 
         //if light, get the status of one light in particular
         if (light) {
-            url = this.hueIp + this.HUE_CONST.API + this.hueUser + this.HUE_CONST.LIGHTS + light + this.HUE_CONST.STATE;
+            url = this.hueIp + this.HUE_CONST.API + this.hueUser + this.HUE_CONST.LIGHTS + light;
         } else {
         //else get all lights names
             url = this.hueIp + this.HUE_CONST.API + this.hueUser + this.HUE_CONST.LIGHTS;
         }
 
-        jQuery.get(url, null, callback.bind(this));
+        $.get(url, null, callback.bind(this));
+    };
+
+    HomeHue.prototype.set = function(callback, light, data) {
+        var url = "http://localhost:8080/light/" + light;
+        $.get(url, "data=" + JSON.stringify(data), callback.bind(this));
     };
 
     HomeHue.prototype.checkRequired = function() {
-        if (!jQuery || !jQuery.get) {
-            this.log("HomeHue Error: checkRequired --> jQuery not present");
+        if (!$ || !window.XMLHttpRequest) {
+            this.log("HomeHue Error: checkRequired --> $ not present");
             return false;
         }
 
@@ -80,16 +96,28 @@
         }
     };
 
-    var Box = function(name, template) {
-        if (!name || !template) {
-            this.log("Box Error: constructor --> name or template not present");
+    /**
+     * Class Box
+     * Light container with control button
+     */
+
+    var Box = function(name, id, app) {
+        if (!name || !app || !id) {
+            this.log("Box Error: constructor --> name, app or id are not present");
             return;
         }
 
-        this.wrapper = template.box.cloneNode(true);
-        this.boxName = this.wrapper.getElementsByClassName("HHboxName")[0].firstChild;
+        this.app = app;
+        this.id = id;
+        this.wrapper = app.template.box.cloneNode(true);
+        this.boxOnOff = this.wrapper.getElementsByClassName("HHBoxOnOff")[0];
 
+        this.init(name);
+    };
+
+    Box.prototype.init = function(name) {
         this.setName(name);
+        $(this.boxOnOff).on("click", this.app.setHueOnOff.bind(this));
     };
 
     Box.prototype.append = function(parent) {
@@ -109,11 +137,27 @@
     };
 
     Box.prototype.getName = function() {
-        return this.boxName.innerHTML;
+        return this.boxOnOff.firstChild.innerHTML;
     };
 
     Box.prototype.setName = function(name) {
-        this.boxName.innerHTML = name;
+        this.boxOnOff.firstChild.innerHTML = name;
+    };
+
+    Box.prototype.setOnOff = function(on) {
+        if (!on && this.boxOnOff.className.indexOf("success") !== -1) {
+            this.boxOnOff.className = this.boxOnOff.className.replace("success", "danger");
+        } else if (this.boxOnOff.className.indexOf("danger") !== -1) {
+            this.boxOnOff.className = this.boxOnOff.className.replace("danger", "success");
+        }
+    };
+
+    Box.prototype.getOnOff = function() {
+        if (this.boxOnOff.className.indexOf("success") !== -1) {
+            return true;
+        } else {
+            return false;
+        }
     };
 
     var app = new HomeHue();

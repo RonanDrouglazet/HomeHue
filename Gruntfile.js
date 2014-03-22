@@ -9,6 +9,14 @@ module.exports = function(grunt) {
                 files: {
                     "dist/app.min.js": ["src/app.js"]
                 }
+            },
+            node: {
+                options: {
+                    report: "gzip"
+                },
+                files: {
+                    "dist/node.min.js": ["src/node.js"]
+                }
             }
         },
         jshint: {
@@ -20,12 +28,13 @@ module.exports = function(grunt) {
                   "undef": true,
                   "node": true,
                   "globals": {
-                    "jQuery": true,
                     "window": true,
-                    "document": true
+                    "document": true,
+                    "$": true,
+                    "XMLHttpRequest": true
                   }
                 },
-                src: ["Gruntfile.js", "src/app.js"]
+                src: ["Gruntfile.js", "src/app.js", "src/node.js"]
             }
         }
     });
