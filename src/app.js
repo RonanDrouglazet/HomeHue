@@ -10,6 +10,7 @@
         this.box = {};
         this.timerAppCallback = [];
         this.timerAppInterval = 0;
+        this.sleepInterval = 0;
 
         this.HUE_CONST = {
             LIGHTS: "/allLight",
@@ -33,7 +34,9 @@
         try{
             this.template = {
                 box: document.getElementsByClassName("HHBox")[0],
-                boxOnOff: null
+                boxOnOff: null,
+                boxGoSleep: null,
+                boxWakeUp: null
             };
 
             this.template.box.parentNode.removeChild(this.template.box);
@@ -68,6 +71,26 @@
         this.app.set(this.setOnOff.bind(this, !this.getOnOff()), this.id, {
             "on": !this.getOnOff()
         });
+    };
+
+    HomeHue.prototype.sleepLight = function() {
+        //var time = 180000;
+        var time = 90000;
+        function createInterval(data) {
+            var bri = JSON.parse(data).state.bri;
+            var step = time / bri;
+
+            this.sleepInterval = setInterval(function(){
+                bri--;
+                this.app.set(function() {}, this.id, {"bri": bri});
+                if (bri === 0) {
+                    this.app.setHueOnOff.bind(this)();
+                    clearInterval(this.sleepInterval);
+                }
+            }.bind(this), step);
+        }
+
+        this.app.get(createInterval.bind(this), this.id);
     };
 
     HomeHue.prototype.get = function(callback, light) {
@@ -127,6 +150,7 @@
         this.id = id;
         this.wrapper = app.template.box.cloneNode(true);
         this.boxOnOff = this.wrapper.getElementsByClassName("HHBoxOnOff")[0];
+        this.boxGoSleep = this.wrapper.getElementsByClassName("HHBoxGoSleep")[0];
 
         this.init(name);
     };
@@ -134,6 +158,7 @@
     Box.prototype.init = function(name) {
         this.setName(name);
         $(this.boxOnOff).on("click", this.app.setHueOnOff.bind(this));
+        $(this.boxGoSleep).on("click", this.app.sleepLight.bind(this));
     };
 
     Box.prototype.append = function(parent) {
@@ -157,7 +182,7 @@
     };
 
     Box.prototype.setName = function(name) {
-        this.boxOnOff.firstChild.innerHTML = name;
+        this.boxOnOff.firstChild.innerHTML = name.toUpperCase();
     };
 
     Box.prototype.setOnOff = function(on) {
