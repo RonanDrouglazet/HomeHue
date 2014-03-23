@@ -10,12 +10,25 @@ homehue.get("/", function(req, res) {
     res.sendfile("." + req.url);
 })
 .get("/allLight", function(req, res) {
-
+    //console.log("GET --> /allLight");
+    createHueLightRequest("GET", null, "", function(response) {
+        res.write(response);
+        res.send();
+    });
 })
-.get("/light/:id", function(req, res, next) {
-    console.log(req.query.data);
-    createHueLightRequest("PUT", req.params.id + "/state", req.query.data);
-    res.send(200);
+.get("/light/:id", function(req, res) {
+    //console.log("SET --> /light/" + req.params.id);
+    if (req.query.data) {
+        createHueLightRequest("PUT", req.params.id + "/state", req.query.data, function(response) {
+            res.write(response);
+            res.send();
+        });
+    } else {
+        createHueLightRequest("GET", req.params.id, "", function(response) {
+            res.write(response);
+            res.send();
+        });
+    }
 })
 .use(function(req, res, next){
     console.log(req.url);
@@ -23,7 +36,7 @@ homehue.get("/", function(req, res) {
     res.send(404, "Page Introuvable");
 });
 
-function createHueLightRequest (method, path, body) {
+function createHueLightRequest (method, path, body, success) {
     var options = {
       hostname: '192.168.1.12',
       path: '/api/homehueappjs/lights/' + (path ? path : ""),
@@ -31,7 +44,17 @@ function createHueLightRequest (method, path, body) {
     };
 
     var req = http.request(options, function(res) {
-      console.log('res: ' + res);
+        var data = "";
+        res.on('data', function (chunk) {
+            //console.log('RESPONSE DATA --> ' + chunk);
+            data += chunk;
+        })
+        .on('end', function() {
+            //console.log('RESPONSE COMPLETE --> ' + data);
+            if (success) {
+                success(data);
+            }
+        });
     });
 
     req.on('error', function(e) {
