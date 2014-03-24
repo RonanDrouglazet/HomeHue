@@ -8,9 +8,8 @@
     var HomeHue = function() {
         this.template = {};
         this.box = {};
-        this.timerAppCallback = [];
-        this.timerAppInterval = 0;
-        this.sleepInterval = 0;
+        this.timerAppInterval = null;
+        this.sleepInterval = null;
 
         this.HUE_CONST = {
             LIGHTS: "/allLight",
@@ -26,17 +25,13 @@
         this.getTemplate();
         this.getHue();
 
-        this.timerAppCallback.push(this.getHue.bind(this));
-        this.timerAppInterval = setInterval(this.timerApp.bind(this), 1000);
+        this.timerAppInterval = setInterval(this.getHue.bind(this), 1000);
     };
 
     HomeHue.prototype.getTemplate = function() {
         try{
             this.template = {
-                box: document.getElementsByClassName("HHBox")[0],
-                boxOnOff: null,
-                boxGoSleep: null,
-                boxWakeUp: null
+                box: document.getElementsByClassName("HHBox")[0]
             };
 
             this.template.box.parentNode.removeChild(this.template.box);
@@ -75,17 +70,28 @@
 
     HomeHue.prototype.sleepLight = function() {
         //var time = 180000;
+        if (this.sleepInterval) {
+            clearInterval(this.sleepInterval);
+            this.sleepInterval = null;
+            this.setSleepProgress(0);
+
+            return;
+        }
+
         var time = 90000;
         function createInterval(data) {
             var bri = JSON.parse(data).state.bri;
             var step = time / bri;
+            var actual = bri;
 
             this.sleepInterval = setInterval(function(){
-                bri--;
-                this.app.set(function() {}, this.id, {"bri": bri});
-                if (bri === 0) {
+                actual--;
+                this.app.set(function() {}, this.id, {"bri": actual});
+                this.setSleepProgress((actual * 100) / bri);
+                if (actual === 0) {
                     this.app.setHueOnOff.bind(this)();
                     clearInterval(this.sleepInterval);
+                    this.sleepInterval = null;
                 }
             }.bind(this), step);
         }
@@ -127,14 +133,6 @@
         }
     };
 
-    HomeHue.prototype.timerApp = function() {
-        for (var i in this.timerAppCallback) {
-            if (this.timerAppCallback.hasOwnProperty(i)) {
-                this.timerAppCallback[i]();
-            }
-        }
-    };
-
     /**
      * Class Box
      * Light container with control button
@@ -151,6 +149,7 @@
         this.wrapper = app.template.box.cloneNode(true);
         this.boxOnOff = this.wrapper.getElementsByClassName("HHBoxOnOff")[0];
         this.boxGoSleep = this.wrapper.getElementsByClassName("HHBoxGoSleep")[0];
+        this.boxGoSleepProgress = null;
 
         this.init(name);
     };
@@ -199,6 +198,25 @@
         } else {
             return false;
         }
+    };
+
+    Box.prototype.setSleepProgress = function(progress) {
+        if (!this.boxGoSleepProgress) {
+            this.boxGoSleepProgress = this.wrapper.getElementsByClassName("progress-bar")[0];
+        }
+
+        $(this.boxGoSleepProgress).css('width', progress+'%').attr('aria-valuenow', progress);
+
+        if (parseInt(progress) === 0) {
+            this.boxGoSleepProgress.parentNode.style.opacity = "0";
+            $(this.boxGoSleepProgress).css('width', '100%');
+        } else {
+            this.boxGoSleepProgress.parentNode.style.opacity = "1";
+        }
+    };
+
+    Box.prototype.getSleepProgress = function() {
+        return parseInt(this.boxGoSleepProgress.style.with);
     };
 
     var app = new HomeHue();

@@ -5,6 +5,15 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>HomeHue</title>
+    <!-- Bootstrap -->
+    <link href="dist/bootstrap/bootstrap.min.css" rel="stylesheet">
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
     <style type="text/css">
     body {
         padding-left: 10px;
@@ -32,25 +41,36 @@
     .glyphicon-off {
         top: 2px !important;
     }
+    .progress {
+        height: 5px;
+        width: 90%;
+        margin-left: 3px;
+        opacity: 0;
+        margin-bottom: 0px;
+    }
     </style>
-
-    <!-- Bootstrap -->
-    <link href="dist/bootstrap/bootstrap.min.css" rel="stylesheet">
-
-    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
-    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
-    <!--[if lt IE 9]>
-      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-      <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
-    <![endif]-->
   </head>
   <body>
 
     <div class="HHBox panel panel-default pull-left">
       <div class="panel-body">
         <button type="button" class="HHBoxOnOff btn btn-success"><span class="pull-left">Chambre</span><span class="glyphicon glyphicon-off pull-right"></span></button>
-        <button type="button" class="HHBoxGoSleep btn btn-warning"><span>GO SLEEP</span></button>
-        <button type="button" class="HHBoxWakeUp btn btn-info"><span>WAKE UP</span></button>
+        <button type="button" class="HHBoxGoSleep btn btn-warning">
+            <span>GO SLEEP</span>
+            <div class="progress">
+                <div class="progress-bar" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%;">
+                    <span class="sr-only">100% Complete</span>
+                </div>
+            </div>
+        </button>
+        <button type="button" class="HHBoxWakeUp btn btn-info">
+            <span>WAKE UP</span>
+            <div class="progress">
+                <div class="progress-bar" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%;">
+                    <span class="sr-only">100% Complete</span>
+                </div>
+            </div>
+        </button>
       </div>
     </div>
 
