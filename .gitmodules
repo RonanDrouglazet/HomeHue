@@ -1,6 +1,3 @@
 [submodule "bootstrap"]
 	path = bootstrap
 	url = https://github.com/twbs/bootstrap.git
-[submodule "bootstrap_slider"]
-	path = bootstrap_slider
-	url = https://github.com/seiyria/bootstrap-slider.git
