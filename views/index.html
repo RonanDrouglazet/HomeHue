@@ -17,12 +17,16 @@
     <style type="text/css">
     body {
         padding-left: 10px;
-        background-color: #252525 !important;
+        padding-top: 70px;
+        background-color: rgba(37, 37, 37, 0.17);
     }
     .panel {
         width: 300px;
         margin-right: 10px;
         margin-top: 10px;
+        background-color: #222;
+        -webkit-box-shadow: 0 1px 1px rgba(0,0,0,.5);
+        box-shadow: 0 1px 1px rgba(0,0,0,.5);
     }
     .HHBoxOnOff {
         width: 80%;
@@ -32,11 +36,13 @@
         width: 38%;
         margin-left: 20px;
         margin-top: 5px;
+        height: 33px;
     }
     .HHBoxWakeUp {
         width: 38%;
         margin-left: 2%;
         margin-top: 5px;
+        height: 33px;
     }
     .glyphicon-off {
         top: 2px !important;
@@ -44,13 +50,30 @@
     .progress {
         height: 5px;
         width: 90%;
-        margin-left: 3px;
+        margin-left: 5px;
         opacity: 0;
         margin-bottom: 0px;
+        margin-top: -1px;
     }
     </style>
   </head>
   <body>
+  <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#">HomeHue</a>
+        </div>
+        <div class="navbar-collapse collapse">
+          <!--TODO-->
+        </div><!--/.navbar-collapse -->
+      </div>
+    </div>
 
     <div class="HHBox panel panel-default pull-left">
       <div class="panel-body">

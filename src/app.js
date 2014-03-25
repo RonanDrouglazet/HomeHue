@@ -94,6 +94,8 @@
                     this.sleepInterval = null;
                 }
             }.bind(this), step);
+
+            this.setSleepProgress((actual * 100) / bri);
         }
 
         this.app.get(createInterval.bind(this), this.id);
