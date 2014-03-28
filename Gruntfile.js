@@ -2,20 +2,20 @@ module.exports = function(grunt) {
     grunt.initConfig({
         pkg: grunt.file.readJSON("package.json"),
         uglify: {
-            app: {
+            front: {
                 options: {
                     report: "gzip"
                 },
                 files: {
-                    "dist/app.min.js": ["src/app.js"]
+                    "dist/app_front.min.js": ["src/app_front.js"]
                 }
             },
-            node: {
+            back: {
                 options: {
                     report: "gzip"
                 },
                 files: {
-                    "dist/node.min.js": ["src/node.js"]
+                    "dist/app_back.min.js": ["src/app_back.js"]
                 }
             }
         },
@@ -34,7 +34,7 @@ module.exports = function(grunt) {
                     "XMLHttpRequest": true
                   }
                 },
-                src: ["Gruntfile.js", "src/app.js", "src/node.js"]
+                src: ["Gruntfile.js", "src/app_back.js", "src/app_front.js"]
             }
         }
     });
