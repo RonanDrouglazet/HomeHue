@@ -1,32 +1,14 @@
-make: before cleanSubmodule git submodule cleanSubmodule2 homehue
+make: bowermodule homehue
 
-before:
-	git submodule init
-	git submodule update --init --recursive
+install:
+	sudo npm i -g bower
 	npm install
+	bower install bootstrap
+	bower install seiyria-bootstrap-slider
 
-git:
-	cd bootstrap && git pull --rebase origin master
-	cd bootstrap-slider && git pull --rebase origin master
-
-submodule:
-	cd bootstrap && npm install
-	cd bootstrap && grunt dist
-	cd bootstrap-slider && npm install
-	cd bootstrap-slider && grunt test
-	cp bootstrap-slider/dist/bootstrap-slider.min.js dist/bootstrap/bootstrap-slider.min.js
-	cp bootstrap-slider/dist/css/bootstrap-slider.min.css dist/bootstrap/bootstrap-slider.min.css
-	cp bootstrap/dist/js/bootstrap.min.js dist/bootstrap/bootstrap.min.js
-	cp bootstrap/dist/css/bootstrap.min.css dist/bootstrap/bootstrap.min.css
-	cp -R bootstrap/dist/fonts/* dist/fonts/
-
-cleanSubmodule:
-	cd bootstrap && git checkout .
-	cd bootstrap-slider && git checkout .
-
-cleanSubmodule2:
-	cd bootstrap && git checkout .
-	cd bootstrap-slider && git checkout .
+bowermodule:
+	#If you have not bower, call "make install" before all
+	bower update
 
 homehue:
 	grunt
