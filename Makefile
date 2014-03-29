@@ -2,6 +2,7 @@ make: bowermodule homehue
 
 install:
 	sudo npm i -g bower
+	sudo npm i -g grunt-cli
 	bower install bootstrap
 	bower install seiyria-bootstrap-slider
 
