@@ -7,6 +7,7 @@
     <title>HomeHue</title>
     <!-- Bootstrap -->
     <link href="bower_components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="bower_components/seiyria-bootstrap-slider/dist/css/bootstrap-slider.min.css" rel="stylesheet">
 
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -14,48 +15,9 @@
       <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
       <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
     <![endif]-->
-    <style type="text/css">
-    body {
-        padding-left: 10px;
-        padding-top: 70px;
-        background-color: rgba(37, 37, 37, 0.17);
-    }
-    .panel {
-        width: 300px;
-        margin-right: 10px;
-        margin-top: 10px;
-        background-color: #222;
-        -webkit-box-shadow: 0 1px 1px rgba(0,0,0,.5);
-        box-shadow: 0 1px 1px rgba(0,0,0,.5);
-    }
-    .HHBoxOnOff {
-        width: 80%;
-        margin-left: 20px;
-    }
-    .HHBoxGoSleep {
-        width: 38%;
-        margin-left: 20px;
-        margin-top: 5px;
-        height: 33px;
-    }
-    .HHBoxWakeUp {
-        width: 38%;
-        margin-left: 2%;
-        margin-top: 5px;
-        height: 33px;
-    }
-    .glyphicon-off {
-        top: 2px !important;
-    }
-    .progress {
-        height: 5px;
-        width: 90%;
-        margin-left: 5px;
-        opacity: 0;
-        margin-bottom: 0px;
-        margin-top: -1px;
-    }
-    </style>
+
+    <!-- HomeHue css -->
+    <link href="style.css" rel="stylesheet">
   </head>
   <body>
   <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
@@ -75,9 +37,9 @@
       </div>
     </div>
 
-    <div class="HHBox panel panel-default pull-left">
+    <div class="HHBox panel panel-default ">
       <div class="panel-body">
-        <button type="button" class="HHBoxOnOff btn btn-success"><span class="pull-left">Chambre</span><span class="glyphicon glyphicon-off pull-right"></span></button>
+        <button type="button" class="HHBoxOnOff btn btn-success"><span class="">Chambre</span><span class="glyphicon glyphicon-off pull-right"></span></button>
         <button type="button" class="HHBoxGoSleep btn btn-warning">
             <span>GO SLEEP</span>
             <div class="progress">
@@ -94,13 +56,17 @@
                 </div>
             </div>
         </button>
+        <input data-slider-id='HHBoxSlider' type="text" data-slider-min="0" data-slider-max="255" data-slider-step="1" data-slider-value="255"/>
       </div>
     </div>
 
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="bower_components/modernizr/modernizr.js"></script>
     <script src="bower_components/jquery/dist/jquery.min.js"></script>
     <!-- Include all compiled plugins (below), or include individual files as needed -->
     <script src="bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script src="bower_components/seiyria-bootstrap-slider/dist/bootstrap-slider.min.js"></script>
+    <!-- HomeHue app -->
     <script src="dist/app_front.min.js"></script>
   </body>
 </html>

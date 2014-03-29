@@ -50,6 +50,7 @@
         function returnState(box, data) {
             var d = JSON.parse(data);
             box.setOnOff(d.state.on);
+            box.setSlider(d.state.bri);
         }
 
         for (var lightId in hue) {
@@ -86,7 +87,7 @@
 
             this.sleepInterval = setInterval(function(){
                 actual--;
-                this.app.set(function() {}, this.id, {"bri": actual});
+                this.app.set(null, this.id, {"bri": actual});
                 this.setSleepProgress((actual * 100) / bri);
                 if (actual === 0) {
                     this.app.setHueOnOff.bind(this)();
@@ -112,17 +113,16 @@
             url = this.HUE_CONST.LIGHTS;
         }
 
-        $.get(url, null, callback.bind(this));
+        $.get(url, null, callback ? callback.bind(this) : null);
     };
 
     HomeHue.prototype.set = function(callback, light, data) {
         var url = this.HUE_CONST.STATE + light;
-        $.get(url, "data=" + JSON.stringify(data), callback.bind(this));
+        $.get(url, "data=" + JSON.stringify(data), callback ? callback.bind(this) : null);
     };
 
     HomeHue.prototype.checkRequired = function() {
-        if (!$ || !window.XMLHttpRequest) {
-            this.log("HomeHue Error: checkRequired --> $ not present");
+        if (!$) {
             return false;
         }
 
@@ -152,6 +152,9 @@
         this.boxOnOff = this.wrapper.getElementsByClassName("HHBoxOnOff")[0];
         this.boxGoSleep = this.wrapper.getElementsByClassName("HHBoxGoSleep")[0];
         this.boxGoSleepProgress = null;
+        this.slider = this.wrapper.getElementsByTagName("input")[0];
+        this.isSliding = false;
+        this.intervalDraging = null;
 
         this.init(name);
     };
@@ -163,19 +166,32 @@
     };
 
     Box.prototype.append = function(parent) {
-        if (parent && parent.appendChild) {
-            parent.appendChild(this.wrapper);
-        } else {
-            this.app.log("Box Error: append --> Box.parent not present");
-        }
+        parent.appendChild(this.wrapper);
+
+        //init slider on append and not on init because off tootip bug placement if slider ar not in the DOM
+        $(this.slider).slider();
+        $(this.slider).slider().on("slideStart", this.beginSlide.bind(this));
+        $(this.slider).slider().on("slideStop", this.endSlide.bind(this));
+    };
+
+    Box.prototype.beginSlide = function() {
+        //prevent external setSlider call impossible to not disturb draging (when refreshing status for example)
+        this.isSliding = true;
+        //prevent from too many app call with a classic updating method on slide event
+        this.intervalDraging = setInterval(function() {
+            this.app.set(null, this.id, {"bri": this.getSlider()});
+        }.bind(this), 500);
+    };
+
+    Box.prototype.endSlide = function() {
+        this.isSliding = false;
+        clearInterval(this.intervalDraging);
+        this.intervalDraging = null;
+        this.app.set(null, this.id, {"bri": this.getSlider()});
     };
 
     Box.prototype.remove = function() {
-        if (this.wrapper.parentNode) {
-            this.wrapper.parentNode.removeChild(this.wrapper);
-        } else {
-            this.app.log("Box Error: remove --> Box.parentNode not present");
-        }
+        this.wrapper.parentNode.removeChild(this.wrapper);
     };
 
     Box.prototype.getName = function() {
@@ -219,6 +235,16 @@
 
     Box.prototype.getSleepProgress = function() {
         return parseInt(this.boxGoSleepProgress.style.with);
+    };
+
+    Box.prototype.setSlider = function(value) {
+        if (!this.isSliding) {
+            $(this.slider).slider('setValue', value);
+        }
+    };
+
+    Box.prototype.getSlider = function() {
+        return $(this.slider).slider('getValue');
     };
 
     var app = new HomeHue();
