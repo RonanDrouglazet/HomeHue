@@ -2,6 +2,7 @@ var express = require("express");
 var http = require("http");
 
 var homehue = express();
+var sleepObject = {};
 
 /*
  * GET all light status
@@ -24,10 +25,39 @@ homehue.get("/allLight", function(req, res) {
         });
     } else {
         createHueLightRequest("GET", req.params.id, "", function(response) {
+            if (sleepObject[req.params.id] && sleepObject[req.params.id].sleepInterval) {
+                response = JSON.parse(response);
+                response.sleepTimer = {
+                    "bri": sleepObject[req.params.id].bri,
+                    "actual": sleepObject[req.params.id].actual
+                };
+                response = JSON.stringify(response);
+            }
             res.write(response);
             res.send();
         });
     }
+})
+
+/*
+ * START / STOP sleep on one light
+ */
+.get("/sleep/:id", function(req, res) {
+    if (!sleepObject[req.params.id]) {
+    //if not exist, create it
+        sleepObject[req.params.id] = {};
+    }
+
+    if (sleepObject[req.params.id].sleepInterval) {
+    //if already running, stop it
+        clearInterval(sleepObject[req.params.id].sleepInterval);
+        sleepObject[req.params.id].sleepInterval = null;
+    } else {
+    //else, create sleep timer
+        createSleepTimer(req.params.id, sleepObject[req.params.id]);
+    }
+
+    res.send();
 })
 
 /*
@@ -68,6 +98,25 @@ function createHueLightRequest (method, path, body, success) {
 
     req.write(body);
     req.end();
+}
+
+function createSleepTimer(lightId, sleepObject) {
+    createHueLightRequest("GET", lightId, "", function (data) {
+        sleepObject.time = 90000;
+        sleepObject.bri = JSON.parse(data).state.bri;
+        sleepObject.step = sleepObject.time / sleepObject.bri;
+        sleepObject.actual = sleepObject.bri;
+
+        sleepObject.sleepInterval = setInterval(function(){
+            sleepObject.actual--;
+            createHueLightRequest("PUT", lightId + "/state", JSON.stringify({"bri": sleepObject.actual}), null);
+            if (sleepObject.actual === 0) {
+                createHueLightRequest("PUT", lightId + "/state", JSON.stringify({"on": false}), null);
+                clearInterval(sleepObject.sleepInterval);
+                sleepObject.sleepInterval = null;
+            }
+        }, sleepObject.step);
+    });
 }
 
 /*

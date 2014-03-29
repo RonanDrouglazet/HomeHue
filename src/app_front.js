@@ -13,7 +13,8 @@
 
         this.HUE_CONST = {
             LIGHTS: "/allLight",
-            STATE: "/light/"
+            STATE: "/light/:id",
+            SLEEP: "/sleep/:id"
         };
     };
 
@@ -51,6 +52,9 @@
             var d = JSON.parse(data);
             box.setOnOff(d.state.on);
             box.setSlider(d.state.bri);
+
+            var sleepProgress = d.sleepTimer ? (d.sleepTimer.actual * 100) / d.sleepTimer.bri : 0;
+            box.setSleepProgress(sleepProgress);
         }
 
         for (var lightId in hue) {
@@ -70,36 +74,8 @@
     };
 
     HomeHue.prototype.sleepLight = function() {
-        //var time = 180000;
-        if (this.sleepInterval) {
-            clearInterval(this.sleepInterval);
-            this.sleepInterval = null;
-            this.setSleepProgress(0);
-
-            return;
-        }
-
-        var time = 90000;
-        function createInterval(data) {
-            var bri = JSON.parse(data).state.bri;
-            var step = time / bri;
-            var actual = bri;
-
-            this.sleepInterval = setInterval(function(){
-                actual--;
-                this.app.set(null, this.id, {"bri": actual});
-                this.setSleepProgress((actual * 100) / bri);
-                if (actual === 0) {
-                    this.app.setHueOnOff.bind(this)();
-                    clearInterval(this.sleepInterval);
-                    this.sleepInterval = null;
-                }
-            }.bind(this), step);
-
-            this.setSleepProgress((actual * 100) / bri);
-        }
-
-        this.app.get(createInterval.bind(this), this.id);
+        var url = this.app.HUE_CONST.SLEEP.replace(":id", this.id);
+        $.get(url + "?" + Date.now(), null, null);
     };
 
     HomeHue.prototype.get = function(callback, light) {
@@ -107,18 +83,18 @@
 
         //if light, get the status of one light in particular
         if (light) {
-            url = this.HUE_CONST.STATE + light;
+            url = this.HUE_CONST.STATE.replace(":id", light);
         } else {
         //else get all lights names
             url = this.HUE_CONST.LIGHTS;
         }
 
-        $.get(url, null, callback ? callback.bind(this) : null);
+        $.get(url + "?" + Date.now(), null, callback ? callback.bind(this) : null);
     };
 
     HomeHue.prototype.set = function(callback, light, data) {
-        var url = this.HUE_CONST.STATE + light;
-        $.get(url, "data=" + JSON.stringify(data), callback ? callback.bind(this) : null);
+        var url = this.HUE_CONST.STATE.replace(":id", light);
+        $.get(url + "?" + Date.now(), "data=" + JSON.stringify(data), callback ? callback.bind(this) : null);
     };
 
     HomeHue.prototype.checkRequired = function() {
