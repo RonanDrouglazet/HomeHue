@@ -18,10 +18,4 @@ Next time:
 
 ##TODO LIST FOR V1
 
-1. do wake up feature
-
-2. create personal conf in a user.json, if first run, allow user to fill his conf, then, add a edit button
-
-3. add color feature
-
-4. add current server status (and choice ?)
+Click on the badge on the top of the page to see the backlog or see issue on github
