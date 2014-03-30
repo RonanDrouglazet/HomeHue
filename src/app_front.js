@@ -14,15 +14,12 @@
         this.HUE_CONST = {
             LIGHTS: "/allLight",
             STATE: "/light/:id",
-            SLEEP: "/sleep/:id"
+            SLEEP: "/timer/sleep/:id",
+            WAKEUP: "/timer/wakeup/:id"
         };
     };
 
     HomeHue.prototype.init = function() {
-        if (!this.checkRequired()) {
-            throw "Error: required (jQuery) are not present";
-        }
-
         this.getTemplate();
         this.getHue();
 
@@ -53,8 +50,18 @@
             box.setOnOff(d.state.on);
             box.setSlider(d.state.bri);
 
-            var sleepProgress = d.sleepTimer ? (d.sleepTimer.actual * 100) / d.sleepTimer.bri : 0;
-            box.setSleepProgress(sleepProgress);
+            if (d.timer && d.timer.type === "sleep") {
+                var sleepProgress = (d.timer.actual * 100) / d.timer.bri;
+                box.setSleepProgress(sleepProgress);
+                box.setWakeUpProgress(255);
+            } else if (d.timer && d.timer.type === "wakeup") {
+                var wakeUpProgress = (d.timer.actual * 100) / 255;
+                box.setWakeUpProgress(wakeUpProgress);
+                box.setSleepProgress(0);
+            } else {
+                box.setSleepProgress(0);
+                box.setWakeUpProgress(255);
+            }
         }
 
         for (var lightId in hue) {
@@ -73,8 +80,8 @@
         });
     };
 
-    HomeHue.prototype.sleepLight = function() {
-        var url = this.app.HUE_CONST.SLEEP.replace(":id", this.id);
+    HomeHue.prototype.timerLight = function(typeUrl) {
+        var url = typeUrl.replace(":id", this.id);
         $.get(url + "?" + Date.now(), null, null);
     };
 
@@ -95,14 +102,6 @@
     HomeHue.prototype.set = function(callback, light, data) {
         var url = this.HUE_CONST.STATE.replace(":id", light);
         $.get(url + "?" + Date.now(), "data=" + JSON.stringify(data), callback ? callback.bind(this) : null);
-    };
-
-    HomeHue.prototype.checkRequired = function() {
-        if (!$) {
-            return false;
-        }
-
-        return true;
     };
 
     HomeHue.prototype.log = function() {
@@ -127,7 +126,9 @@
         this.wrapper = app.template.box.cloneNode(true);
         this.boxOnOff = this.wrapper.getElementsByClassName("HHBoxOnOff")[0];
         this.boxGoSleep = this.wrapper.getElementsByClassName("HHBoxGoSleep")[0];
-        this.boxGoSleepProgress = null;
+        this.boxGoSleepProgress = this.boxGoSleep.getElementsByClassName("progress-bar")[0];
+        this.boxWakeUp = this.wrapper.getElementsByClassName("HHBoxWakeUp")[0];
+        this.boxWakeUpProgress = this.boxWakeUp.getElementsByClassName("progress-bar")[0];
         this.slider = this.wrapper.getElementsByTagName("input")[0];
         this.isSliding = false;
         this.intervalDraging = null;
@@ -138,7 +139,8 @@
     Box.prototype.init = function(name) {
         this.setName(name);
         $(this.boxOnOff).on("click", this.app.setHueOnOff.bind(this));
-        $(this.boxGoSleep).on("click", this.app.sleepLight.bind(this));
+        $(this.boxGoSleep).on("click", this.app.timerLight.bind(this, this.app.HUE_CONST.SLEEP));
+        $(this.boxWakeUp).on("click", this.app.timerLight.bind(this, this.app.HUE_CONST.WAKEUP));
     };
 
     Box.prototype.append = function(parent) {
@@ -195,15 +197,11 @@
     };
 
     Box.prototype.setSleepProgress = function(progress) {
-        if (!this.boxGoSleepProgress) {
-            this.boxGoSleepProgress = this.wrapper.getElementsByClassName("progress-bar")[0];
-        }
-
-        $(this.boxGoSleepProgress).css('width', progress+'%').attr('aria-valuenow', progress);
+        $(this.boxGoSleepProgress).css("width", progress + "%").attr("aria-valuenow", progress);
 
         if (parseInt(progress) === 0) {
             this.boxGoSleepProgress.parentNode.style.opacity = "0";
-            $(this.boxGoSleepProgress).css('width', '100%');
+            $(this.boxGoSleepProgress).css("width", "100%");
         } else {
             this.boxGoSleepProgress.parentNode.style.opacity = "1";
         }
@@ -213,14 +211,29 @@
         return parseInt(this.boxGoSleepProgress.style.with);
     };
 
+    Box.prototype.setWakeUpProgress = function(progress) {
+        $(this.boxWakeUpProgress).css("width", progress + "%").attr("aria-valuenow", progress);
+
+        if (parseInt(progress) === 255) {
+            this.boxWakeUpProgress.parentNode.style.opacity = "0";
+            $(this.boxWakeUpProgress).css("width", "100%");
+        } else {
+            this.boxWakeUpProgress.parentNode.style.opacity = "1";
+        }
+    };
+
+    Box.prototype.getWakeUpProgress = function() {
+        return parseInt(this.boxWakeUpProgress.style.with);
+    };
+
     Box.prototype.setSlider = function(value) {
         if (!this.isSliding) {
-            $(this.slider).slider('setValue', value);
+            $(this.slider).slider("setValue", value);
         }
     };
 
     Box.prototype.getSlider = function() {
-        return $(this.slider).slider('getValue');
+        return $(this.slider).slider("getValue");
     };
 
     var app = new HomeHue();

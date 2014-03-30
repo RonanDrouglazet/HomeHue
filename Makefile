@@ -1,6 +1,7 @@
 make: bowermodule homehue
 
 install:
+	#If you have not node / npm, please download it at http://nodejs.org/ before calling make install
 	sudo npm i -g bower
 	sudo npm i -g grunt-cli
 	bower install bootstrap
@@ -12,6 +13,7 @@ bowermodule:
 	npm install
 
 homehue:
+	#If you have not grunt, call "make install" before all
 	grunt
 	#    _    _                      _    _
 	#   | |  | |                    | |  | |
@@ -22,4 +24,3 @@ homehue:
 	#
 	#   running on http://localhost:8080
 	node dist/app_back.min.js
-
