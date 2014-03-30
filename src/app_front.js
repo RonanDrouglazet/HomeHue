@@ -12,6 +12,7 @@
         this.sleepInterval = null;
 
         this.HUE_CONST = {
+            SERVER_STATE: "/state",
             LIGHTS: "/allLight",
             STATE: "/light/:id",
             SLEEP: "/timer/sleep/:id",
@@ -20,10 +21,27 @@
     };
 
     HomeHue.prototype.init = function() {
-        this.getTemplate();
-        this.getHue();
+        //get server state before all
+        $.get(this.HUE_CONST.SERVER_STATE, null, function(data) {
+            var d = JSON.parse(data);
+            switch(d.state) {
+                //go init app
+                case "ok":
+                    this.getTemplate();
+                    this.getHue();
 
-        this.timerAppInterval = setInterval(this.getHue.bind(this), 1000);
+                    this.timerAppInterval = setInterval(this.getHue.bind(this), 1000);
+                break;
+
+                //first time ? call a form to fill user conf
+                case "noUserConf":
+                     //todo (maybe relaunch init 1s later ?)
+                break;
+
+                default:
+                    throw "server error: " + data;
+            }
+        }.bind(this));
     };
 
     HomeHue.prototype.getTemplate = function() {
