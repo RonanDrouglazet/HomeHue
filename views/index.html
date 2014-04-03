@@ -20,6 +20,32 @@
     <link href="style.css" rel="stylesheet">
   </head>
   <body>
+  <div id="userInfo">
+    <div class="alert alert-danger" id="alertFormMissField">
+        <strong>Warning!</strong> you must fill all the fields
+    </div>
+    <b>PLEASE FILL YOUR USER INFO</b>
+    <div class="input-group">
+      <input type="text" class="form-control" id="inputHueIp" placeholder="HUE IP (ex:192.168.1.12)">
+      <span class="input-group-addon buttonForm" data-toggle="tooltip" data-placement="left" title="automatic search"><span class="glyphicon glyphicon-search"></span></span>
+    </div>
+    <div class="input-group">
+      <input type="text" class="form-control" id="inputUserName" placeholder="USERNAME">
+      <span class="input-group-addon buttonForm" data-toggle="tooltip" data-placement="left" title="create new user"><span class="glyphicon glyphicon-plus"></span></span>
+    </div>
+    <div class="input-group">
+      <input type="text" class="form-control" id="inputSleepDuration" placeholder="SLEEP DURATION (ex: 9000 ms)">
+      <span class="input-group-addon">ms</span>
+    </div>
+    <div class="input-group">
+      <input type="text" class="form-control" id="inputWakeUpDuration" placeholder="WAKE UP DURATION (ex: 9000 ms)">
+      <span class="input-group-addon">ms</span>
+    </div>
+    <br/>
+    <button type="button" class="btn btn-warning" id="BtnDemoMode">DEMO MODE</button>
+    <button type="button" class="btn btn-success pull-right" id="BtnTestAndSave">TEST & SAVE</button>
+    <div class="alert alert-danger" id="alertUserInfo"></div>
+  </div>
   <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
       <div class="container">
         <div class="navbar-header">

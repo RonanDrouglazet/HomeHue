@@ -1,47 +1,14 @@
-body {
-    padding-left: 10px;
-    padding-top: 70px;
-    background-color: rgba(37, 37, 37, 0.17);
-}
-.panel {
-    width: 300px;
-    margin-right: 10px;
-    margin-top: 10px;
-    background-color: #222;
-    -webkit-box-shadow: 0 1px 1px rgba(0,0,0,.5);
-    box-shadow: 0 1px 1px rgba(0,0,0,.5);
-}
-.HHBoxOnOff {
-    width: 80%;
-    margin-left: 20px;
-}
-.HHBoxGoSleep {
-    width: 38%;
-    margin-left: 20px;
-    margin-top: 5px;
-    height: 33px;
-}
-.HHBoxWakeUp {
-    width: 38%;
-    margin-left: 2%;
-    margin-top: 5px;
-    height: 33px;
-}
-.glyphicon-off {
-    top: 2px !important;
-}
-.progress {
-    height: 5px;
-    width: 90%;
-    margin-left: 5px;
-    opacity: 0;
-    margin-bottom: 0px;
-    margin-top: -1px;
-}
-.HHBox .slider-selection {
-    background: #BABABA;
-}
-.HHBox .slider {
-    top: 5px;
-    left: 21px;
-}
+body { padding-left: 10px; padding-top: 70px; background-color: rgba(37, 37, 37, 0.17); }
+.panel { width: 300px; margin-right: 10px; margin-top: 10px; background-color: #222; -webkit-box-shadow: 0 1px 1px rgba(0,0,0,.5); box-shadow: 0 1px 1px rgba(0,0,0,.5); opacity: 0; -webkit-transition: opacity 1s ease-out; transition: opacity 1s ease-out;}
+.HHBoxOnOff { width: 80%; margin-left: 20px; }
+.HHBoxGoSleep { width: 38%; margin-left: 20px; margin-top: 5px; height: 33px; }
+.HHBoxWakeUp { width: 38%; margin-left: 2%; margin-top: 5px; height: 33px; }
+.glyphicon-off { top: 2px !important; }
+.progress { height: 5px; width: 90%; margin-left: 5px; opacity: 0; margin-bottom: 0px; margin-top: -1px; }
+.HHBox .slider-selection { background: #BABABA; }
+.HHBox .slider { top: 5px; left: 21px; }
+#userInfo {width: 300px; height: 400px; margin: auto; display: none;}
+.input-group {margin-top: 10px;}
+.buttonForm:hover {border: 1px solid #4cae4c; cursor: pointer;background-color: #5cb85c; color: white}
+.alert {display: none;}
+#alertUserInfo {margin-top: 20px;}

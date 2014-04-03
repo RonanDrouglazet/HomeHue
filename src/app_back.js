@@ -31,6 +31,19 @@ homehue.get("/state", function(req, res) {
 })
 
 /*
+ * SET user info on User.conf
+ */
+.get("/setUserInfo", function(req, res) {
+    fs.writeFile("User.conf", JSON.stringify(req.query), function (err) {
+        if (err) {
+            res.send(404);
+            throw err;
+        }
+        res.send();
+    });
+})
+
+/*
  * GET all light status
  */
 .get("/allLight", function(req, res) {
@@ -82,7 +95,7 @@ homehue.get("/state", function(req, res) {
             //if not exist, create it
             if (!timerObject[req.params.id]) {
                 timerObject[req.params.id] = {
-                    time: (req.params.type === hue.SLEEP) ? userConf.duration_sleep : userConf.duration_wakeup
+                    time: (req.params.type === hue.SLEEP) ? parseInt(userConf.duration_sleep) : parseInt(userConf.duration_wakeup)
                 };
             }
 
@@ -108,8 +121,8 @@ homehue.get("/state", function(req, res) {
 /*
  * STATIC and 404
  */
-.use(express.static(__dirname + '/../views'))
-.use(express.static(__dirname + '/../'))
+.use(express.static(__dirname + "/../views"))
+.use(express.static(__dirname + "/../"))
 .use(function(req, res, next){
     res.setHeader("Content-Type", "text/plain");
     res.send(404, "Page Introuvable");
@@ -123,7 +136,7 @@ function readUserConf(callback, force) {
     if (!userConf || force) {
         fs.exists("User.conf", function(exists) {
             if (exists) {
-                fs.readFile('User.conf', function (err, data) {
+                fs.readFile("User.conf", function (err, data) {
                     if (err) {
                         throw err;
                     }
@@ -149,23 +162,23 @@ function readUserConf(callback, force) {
 function createHueLightRequest (method, path, body, success) {
     var options = {
       hostname: userConf.hue_ip,
-      path: '/api/' + userConf.user_name + '/lights/' + (path ? path : ""),
+      path: "/api/" + userConf.user_name + "/lights/" + (path ? path : ""),
       method: method
     };
 
     var req = http.request(options, function(res) {
         var data = "";
-        res.on('data', function (chunk) {
+        res.on("data", function (chunk) {
             data += chunk;
         })
-        .on('end', function() {
+        .on("end", function() {
             if (success) {
                 success(data);
             }
         });
     });
 
-    req.on('error', function(e) {
+    req.on("error", function(e) {
         console.log("Error: " + e.message);
     });
 
@@ -200,7 +213,7 @@ function createTimer(type, lightId, timerObject) {
 
             //when operation is finished
             if (timerObject.actual === end) {
-                //if it's a sleep operation, turn off the light
+                //if it"s a sleep operation, turn off the light
                 if (type === hue.SLEEP) {
                     createHueLightRequest("PUT", lightId + hue.STATE, JSON.stringify({"on": false}), null);
                 }

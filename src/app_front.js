@@ -16,7 +16,8 @@
             LIGHTS: "/allLight",
             STATE: "/light/:id",
             SLEEP: "/timer/sleep/:id",
-            WAKEUP: "/timer/wakeup/:id"
+            WAKEUP: "/timer/wakeup/:id",
+            SET_USER_INFO: "/setUserInfo"
         };
     };
 
@@ -24,24 +25,68 @@
         //get server state before all
         $.get(this.HUE_CONST.SERVER_STATE, null, function(data) {
             var d = JSON.parse(data);
+            this.getTemplate();
+
             switch(d.state) {
                 //go init app
                 case "ok":
-                    this.getTemplate();
                     this.getHue();
-
                     this.timerAppInterval = setInterval(this.getHue.bind(this), 1000);
                 break;
 
                 //first time ? call a form to fill user conf
                 case "noUserConf":
-                     //todo (maybe relaunch init 1s later ?)
+                    this.getUserInfo();
                 break;
 
                 default:
+                    //todo (maybe relaunch init 1s later ?)
                     throw "server error: " + data;
             }
         }.bind(this));
+    };
+
+    HomeHue.prototype.getUserInfo = function() {
+        var wrapper = document.getElementById("userInfo");
+        $(wrapper).toggle(); //show form
+        $(".buttonForm").tooltip({container: "body"}); //active tooltip for button form
+        $("#BtnTestAndSave").on("click", this.testAndSaveUserInfo.bind(this));
+        //$("#BtnDemoMode").on("click", this.demoMode.bind(this)); TODO
+    };
+
+    HomeHue.prototype.testAndSaveUserInfo = function() {
+        var hue = $("#inputHueIp").get(0).value.replace("http://", ""),
+        userName = $("#inputUserName").get(0).value,
+        sleepDuration = $("#inputSleepDuration").get(0).value,
+        wakeUpDuration = $("#inputWakeUpDuration").get(0).value;
+        $.ajaxSetup({ timeout: 1000 }); //set request timeout to 1000ms
+        $(".alert").hide();
+
+        if (hue === "" || userName === "" || sleepDuration === "" || wakeUpDuration === "") {
+            $("#alertFormMissField").show();
+        } else if (isNaN(sleepDuration) || isNaN(wakeUpDuration)) {
+            $("#alertFormMissField").html("sleep / wake up duration must be a number").show();
+        } else {
+            try {
+                $.get("http://" + hue + "/api/" + userName, null, function(data) {
+                    //we receive an array, so it's an error
+                    if (data.length && data[0].error) {
+                        $("#alertUserInfo").html(data[0].error.description).show();
+                    } else {
+                    //all info are ok
+                        $.get(this.HUE_CONST.SET_USER_INFO, {"hue_ip": hue, "user_name": userName, "duration_sleep": sleepDuration, "duration_wakeup": wakeUpDuration}, function(){ window.location.reload(); })
+                        .fail(function() {
+                            $("#alertUserInfo").html("server error, please try again").show();
+                        });
+                    }
+                }.bind(this)).fail(function() {
+                //request fail, hue ip are not ok
+                    $("#alertUserInfo").html("fail to contact hue at " + hue).show();
+                });
+            } catch (e) {
+                $("#alertUserInfo").html("fail to contact hue at http://" + hue).show();
+            }
+        }
     };
 
     HomeHue.prototype.getTemplate = function() {
@@ -163,6 +208,7 @@
 
     Box.prototype.append = function(parent) {
         parent.appendChild(this.wrapper);
+        setTimeout(function() { $(this.wrapper).css("opacity", "1"); }.bind(this), parseInt(this.id) * 100); //fix anoying issue with transition call too fast
 
         //init slider on append and not on init because off tootip bug placement if slider ar not in the DOM
         $(this.slider).slider();
