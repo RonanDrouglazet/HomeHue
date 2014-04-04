@@ -27,20 +27,27 @@ homehue.get("/state", function(req, res) {
         }));
 
         res.send();
-    });
+    }, true);
 })
 
 /*
- * SET user info on User.conf
+ * GET / SET user info on User.conf
  */
-.get("/setUserInfo", function(req, res) {
-    fs.writeFile("User.conf", JSON.stringify(req.query), function (err) {
-        if (err) {
-            res.send(404);
-            throw err;
-        }
-        res.send();
-    });
+.get("/userInfo", function(req, res) {
+    if (req.query.hue_ip) {
+        fs.writeFile("User.conf", JSON.stringify(req.query), function (err) {
+            if (err) {
+                res.send(404);
+                throw err;
+            }
+            res.send();
+        });
+    } else {
+        readUserConf(function(data) {
+            res.write(JSON.stringify(data));
+            res.send();
+        });
+    }
 })
 
 /*
@@ -97,6 +104,8 @@ homehue.get("/state", function(req, res) {
                 timerObject[req.params.id] = {
                     time: (req.params.type === hue.SLEEP) ? parseInt(userConf.duration_sleep) : parseInt(userConf.duration_wakeup)
                 };
+            } else {
+                timerObject[req.params.id].time = (req.params.type === hue.SLEEP) ? parseInt(userConf.duration_sleep) : parseInt(userConf.duration_wakeup);
             }
 
             //if already running, stop it
@@ -147,7 +156,7 @@ function readUserConf(callback, force) {
                         callback(userConf);
                     }
                 });
-            } else if (callback) {
+            } else {
                 callback(null);
             }
         });
@@ -160,30 +169,32 @@ function readUserConf(callback, force) {
  * Create hue request with success callback
  */
 function createHueLightRequest (method, path, body, success) {
-    var options = {
-      hostname: userConf.hue_ip,
-      path: "/api/" + userConf.user_name + "/lights/" + (path ? path : ""),
-      method: method
-    };
+    if (userConf) {
+        var options = {
+          hostname: userConf.hue_ip,
+          path: "/api/" + userConf.user_name + "/lights/" + (path ? path : ""),
+          method: method
+        };
 
-    var req = http.request(options, function(res) {
-        var data = "";
-        res.on("data", function (chunk) {
-            data += chunk;
-        })
-        .on("end", function() {
-            if (success) {
-                success(data);
-            }
+        var req = http.request(options, function(res) {
+            var data = "";
+            res.on("data", function (chunk) {
+                data += chunk;
+            })
+            .on("end", function() {
+                if (success) {
+                    success(data);
+                }
+            });
         });
-    });
 
-    req.on("error", function(e) {
-        console.log("Error: " + e.message);
-    });
+        req.on("error", function(e) {
+            console.log("Error: " + e.message);
+        });
 
-    req.write(body);
-    req.end();
+        req.write(body);
+        req.end();
+    }
 }
 
 /*

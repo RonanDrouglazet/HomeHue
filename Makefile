@@ -23,4 +23,4 @@ homehue:
 	#   |_|  |_|\___/|_| |_| |_|\___|_|  |_|\__,_|\___|
 	#
 	#   running on http://localhost:8080
-	node dist/app_back.min.js
+	node src/app_back.js

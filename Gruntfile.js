@@ -4,18 +4,11 @@ module.exports = function(grunt) {
         uglify: {
             front: {
                 options: {
-                    report: "gzip"
+                    report: "gzip",
+                    sourceMap: true
                 },
                 files: {
                     "dist/app_front.min.js": ["src/app_front.js"]
-                }
-            },
-            back: {
-                options: {
-                    report: "gzip"
-                },
-                files: {
-                    "dist/app_back.min.js": ["src/app_back.js"]
                 }
             }
         },
