@@ -207,14 +207,16 @@ function createTimer(type, lightId, timerObject) {
         var end = (type === hue.SLEEP) ? hue.SLEEP_END : hue.WAKEUP_END; //end of timer, bri = 0 for sleep and 255 for wakeup
         var d = JSON.parse(data); //get an object from string data
 
-        timerObject.actual = timerObject.bri = d.state.bri; //keep original bri
-        timerObject.step = (type === hue.SLEEP) ? (timerObject.time / timerObject.bri) : (timerObject.time / (hue.WAKEUP_END - timerObject.actual)); //get how much timer step we need for operation (sleep or wakeup)
-        timerObject.type = type; //keep timer current type
-
         //generally, when you use wakeup, light is off
         if (type === hue.WAKEUP && !d.state.on) {
             createHueLightRequest("PUT", lightId + hue.STATE, JSON.stringify({"on": true}), null);
+            timerObject.actual = timerObject.bri = 1; //we want to wake up smoothly :) if the light was on bri 250 when switch off, if we switch on they go directly to previous value
+        } else {
+            timerObject.actual = timerObject.bri = d.state.bri; //keep original bri
         }
+
+        timerObject.step = (type === hue.SLEEP) ? (timerObject.time / timerObject.bri) : (timerObject.time / (hue.WAKEUP_END - timerObject.actual)); //get how much timer step we need for operation (sleep or wakeup)
+        timerObject.type = type; //keep timer current type
 
         //begin timer interval for operation (sleep or wakeup)
         timerObject.sleepInterval = setInterval(function(){
