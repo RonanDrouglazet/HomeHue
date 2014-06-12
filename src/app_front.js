@@ -29,22 +29,14 @@
             this.getTemplate();
             this.initFormUserInfo();
 
-            switch(d.state) {
+            if (d.running) {
                 //go init app
-                case "ok":
-                    this.getHue();
-                    this.timerAppInterval = setInterval(this.getHue.bind(this), 1000);
-                    this.getUserInfo();
-                break;
-
+                this.getHue();
+                this.timerAppInterval = setInterval(this.getHue.bind(this), 1000);
+                this.getUserInfo();
+            } else {
                 //first time ? call a form to fill user conf
-                case "noUserConf":
-                    $('.collapse').collapse(); //show form
-                break;
-
-                default:
-                    //todo (maybe relaunch init 1s later ?)
-                    throw "server error: " + data;
+                $('.collapse').collapse(); //show form
             }
         }.bind(this));
     };

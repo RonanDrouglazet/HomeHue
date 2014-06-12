@@ -23,7 +23,7 @@ homehue.get("/state", function(req, res) {
     //always check user conf first
     readUserConf(function(data) {
         res.write(JSON.stringify({
-            "state": data ? "ok" : "noUserConf"
+            "running": data ? true : false
         }));
 
         res.send();
@@ -76,6 +76,7 @@ homehue.get("/state", function(req, res) {
             });
         } else {
             createHueLightRequest("GET", req.params.id, "", function(response) {
+                //if we have a timer running on this light, put this information on response for front side
                 if (timerObject[req.params.id] && timerObject[req.params.id].sleepInterval) {
                     response = JSON.parse(response);
                     response.timer = {
