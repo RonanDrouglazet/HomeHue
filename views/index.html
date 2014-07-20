@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>HomeHue</title>
     <!-- Bootstrap -->
     <link href="dist/css/bootstrap.min.css" rel="stylesheet">
@@ -67,7 +67,7 @@
                         <span class="input-group-addon">ms</span>
                     </div>
                     <br/>
-                    <button type="button" class="btn btn-warning" id="BtnDemoMode">DEMO MODE</button>
+                    <button type="button" class="btn btn-warning" id="BtnPlanning">PLANNING</button>
                     <button type="button" class="btn btn-success pull-right" id="BtnTestAndSave">TEST & SAVE</button>
                     <div class="alert alert-danger" id="alertUserInfo"></div>
                     <br/>
@@ -98,7 +98,129 @@
         <input data-slider-id='HHBoxSlider' type="text" data-slider-min="0" data-slider-max="255" data-slider-step="1" data-slider-value="255"/>
       </div>
     </div>
-</div>
+
+    <div class="HHPlanning">
+        <div class="header">
+            <span class="glyphicon glyphicon-remove-circle text-danger" id="closePlanning"></span>
+            <span class="glyphicon glyphicon-plus text-success" id="addAction"></span>
+        </div>
+        <div class="add">
+            <h3>I want to</h3>
+            <ul class="nav nav-pills nav-stacked">
+              <li class="active"><a href="#">Turn on</a></li>
+              <li><a href="#">Turn off</a></li>
+              <li><a href="#">Wake up</a></li>
+              <li><a href="#">Go sleep</a></li>
+            </ul>
+            <h3>For</h3>
+            <ul class="nav nav-pills nav-stacked">
+              <li class="active"><a href="#">Salon</a></li>
+              <li><a href="#">Chambre</a></li>
+              <li><a href="#">Sdb</a></li>
+            </ul>
+            <h3>On</h3>
+            <ul class="nav nav-pills nav-stacked addActionDay">
+                <li><a href="#">Sunday</a></li>
+                <li><a href="#">Monday</a></li>
+                <li><a href="#">Tuesday</a></li>
+                <li><a href="#">Wednesday</a></li>
+                <li><a href="#">Thursday</a></li>
+                <li><a href="#">Friday</a></li>
+                <li><a href="#">Saturday</a></li>
+            </ul>
+            <h3>At</h3>
+            <select class="form-control addActionHours">
+              <option>00</option>
+              <option>01</option>
+              <option>02</option>
+              <option>03</option>
+              <option>04</option>
+              <option>05</option>
+              <option>06</option>
+              <option>07</option>
+              <option>08</option>
+              <option>09</option>
+              <option>10</option>
+              <option>11</option>
+              <option>12</option>
+              <option>13</option>
+              <option>14</option>
+              <option>15</option>
+              <option>16</option>
+              <option>17</option>
+              <option>18</option>
+              <option>19</option>
+              <option>20</option>
+              <option>21</option>
+              <option>22</option>
+              <option>23</option>
+            </select>
+            :
+            <select class="form-control addActionMinutes">
+              <option>00</option>
+              <option>01</option>
+              <option>02</option>
+              <option>03</option>
+              <option>04</option>
+              <option>05</option>
+              <option>06</option>
+              <option>07</option>
+              <option>08</option>
+              <option>09</option>
+              <option>10</option>
+              <option>11</option>
+              <option>12</option>
+              <option>13</option>
+              <option>14</option>
+              <option>15</option>
+              <option>16</option>
+              <option>17</option>
+              <option>18</option>
+              <option>19</option>
+              <option>20</option>
+              <option>21</option>
+              <option>22</option>
+              <option>23</option>
+              <option>24</option>
+              <option>25</option>
+              <option>26</option>
+              <option>27</option>
+              <option>28</option>
+              <option>29</option>
+              <option>30</option>
+              <option>31</option>
+              <option>32</option>
+              <option>33</option>
+              <option>34</option>
+              <option>35</option>
+              <option>36</option>
+              <option>37</option>
+              <option>38</option>
+              <option>39</option>
+              <option>40</option>
+              <option>41</option>
+              <option>42</option>
+              <option>43</option>
+              <option>44</option>
+              <option>45</option>
+              <option>46</option>
+              <option>47</option>
+              <option>48</option>
+              <option>49</option>
+              <option>50</option>
+              <option>51</option>
+              <option>52</option>
+              <option>53</option>
+              <option>54</option>
+              <option>55</option>
+              <option>56</option>
+              <option>57</option>
+              <option>58</option>
+              <option>59</option>
+            </select>
+        </div>
+    </div>
+</body>
 
 <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
 <script src="bower_components/modernizr/modernizr.js"></script>

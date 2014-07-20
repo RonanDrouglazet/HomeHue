@@ -1,4 +1,4 @@
 node_modules/
 bower_components/
 dist/
-User.conf
+Server.conf

@@ -15,9 +15,9 @@
             SERVER_STATE: "/state",
             LIGHTS: "/allLight",
             STATE: "/light/:id",
-            SLEEP: "/timer/sleep/:id",
-            WAKEUP: "/timer/wakeup/:id",
-            USER_INFO: "/userInfo"
+            SLEEP: "/transition/sleep/:id",
+            WAKEUP: "/transition/wakeup/:id",
+            SERVER_INFO: "/serverInfo"
         };
     };
 
@@ -28,6 +28,7 @@
 
             this.getTemplate();
             this.initFormUserInfo();
+            this.initPlanning();
 
             if (d.running) {
                 //go init app
@@ -45,11 +46,21 @@
         $(".inputForm").tooltip({container: "body"}); //active tooltip for input form
         $(".buttonForm").tooltip({container: "body"}); //active tooltip for button form
         $("#BtnTestAndSave").on("click", this.testAndSaveUserInfo.bind(this));
-        //$("#BtnDemoMode").on("click", this.demoMode.bind(this)); TODO
+        $("#BtnPlanning").on("click", this.showPlanning.bind(this));
+    };
+
+    HomeHue.prototype.initPlanning = function() {
+        $(".HHPlanning #closePlanning").click(function() {
+            $(this.template.planning).css("top", "-100%");
+        }.bind(this));
+        $(".HHPlanning #addAction").click(function() {
+            $(this).hide();
+            $(".HHPlanning .add").show();
+        });
     };
 
     HomeHue.prototype.getUserInfo = function() {
-        $.get(this.HUE_CONST.USER_INFO, null, function(data) {
+        $.get(this.HUE_CONST.SERVER_INFO, null, function(data) {
             var d = JSON.parse(data);
             $("#inputHueIp").get(0).value = d.hue_ip;
             $("#inputUserName").get(0).value = d.user_name;
@@ -78,7 +89,7 @@
                         $("#alertUserInfo").html(data[0].error.description).show();
                     } else {
                     //all info are ok
-                        $.get(this.HUE_CONST.USER_INFO, {"hue_ip": hue, "user_name": userName, "duration_sleep": sleepDuration, "duration_wakeup": wakeUpDuration}, function(){ window.location.reload(); })
+                        $.get(this.HUE_CONST.SERVER_INFO, {"hue_ip": hue, "user_name": userName, "duration_sleep": sleepDuration, "duration_wakeup": wakeUpDuration}, function(){ window.location.reload(); })
                         .fail(function() {
                             $("#alertUserInfo").html("server error, please try again").show();
                         });
@@ -93,13 +104,25 @@
         }
     };
 
+    HomeHue.prototype.showPlanning = function() {
+        $(this.template.planning).css("top", "10%");
+        $(".navbar-toggle").click();
+
+        var now = new Date();
+
+        $(".addActionHours").get(0).selectedIndex = now.getHours();
+        $(".addActionMinutes").get(0).selectedIndex = now.getMinutes();
+        $($(".addActionDay li")[now.getDay()]).addClass("active");
+    };
+
     HomeHue.prototype.getTemplate = function() {
         try{
             this.template = {
-                box: document.getElementsByClassName("HHBox")[0]
+                box: $(".HHBox").get(0),
+                planning: $(".HHPlanning").get(0)
             };
 
-            this.template.box.parentNode.removeChild(this.template.box);
+            $(".HHBox").remove();
         } catch (e) {
             this.log("HomeHue Error: getTemplate -->", e);
         }
