@@ -106,30 +106,30 @@
         </div>
         <div class="add">
             <h3>I want to</h3>
-            <ul class="nav nav-pills nav-stacked">
-              <li class="active"><a href="#">Turn on</a></li>
-              <li><a href="#">Turn off</a></li>
-              <li><a href="#">Wake up</a></li>
-              <li><a href="#">Go sleep</a></li>
+            <ul class="nav nav-pills nav-stacked chooseAction">
+              <li class="active" id="action1"><a href="#">Turn on</a></li>
+              <li id="action0"><a href="#">Turn off</a></li>
+              <li id="action2"><a href="#">Wake up</a></li>
+              <li id="action3"><a href="#">Go sleep</a></li>
             </ul>
             <h3>For</h3>
-            <ul class="nav nav-pills nav-stacked">
-              <li class="active"><a href="#">Salon</a></li>
-              <li><a href="#">Chambre</a></li>
-              <li><a href="#">Sdb</a></li>
+            <ul class="nav nav-pills nav-stacked chooseLight">
+              <li class="active" id="light2"><a href="#">Salon</a></li>
+              <li id="light1"><a href="#">Chambre</a></li>
+              <li id="light3"><a href="#">Sdb</a></li>
             </ul>
             <h3>On</h3>
-            <ul class="nav nav-pills nav-stacked addActionDay">
-                <li><a href="#">Sunday</a></li>
-                <li><a href="#">Monday</a></li>
-                <li><a href="#">Tuesday</a></li>
-                <li><a href="#">Wednesday</a></li>
-                <li><a href="#">Thursday</a></li>
-                <li><a href="#">Friday</a></li>
-                <li><a href="#">Saturday</a></li>
+            <ul class="nav nav-pills nav-stacked chooseDay">
+                <li id="day0"><a href="#">Sunday</a></li>
+                <li id="day1"><a href="#">Monday</a></li>
+                <li id="day2"><a href="#">Tuesday</a></li>
+                <li id="day3"><a href="#">Wednesday</a></li>
+                <li id="day4"><a href="#">Thursday</a></li>
+                <li id="day5"><a href="#">Friday</a></li>
+                <li id="day6"><a href="#">Saturday</a></li>
             </ul>
             <h3>At</h3>
-            <select class="form-control addActionHours">
+            <select class="form-control chooseHours">
               <option>00</option>
               <option>01</option>
               <option>02</option>
@@ -156,7 +156,7 @@
               <option>23</option>
             </select>
             :
-            <select class="form-control addActionMinutes">
+            <select class="form-control chooseMinutes">
               <option>00</option>
               <option>01</option>
               <option>02</option>
@@ -218,6 +218,9 @@
               <option>58</option>
               <option>59</option>
             </select>
+            <h3>Frequency</h3>
+            <button type="button" class="btn btn-default chooseRecurent">Each week</button>&nbsp;&nbsp;
+            <button type="button" class="btn btn-default chooseOnce">Just once</button><br/><br/>
         </div>
     </div>
 </body>

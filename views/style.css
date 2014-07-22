@@ -3,7 +3,7 @@ body { padding-left: 10px; padding-top: 70px; background-color: rgba(37, 37, 37,
 .HHBoxOnOff { width: 80%; margin-left: 20px; }
 .HHBoxGoSleep { width: 38%; margin-left: 20px; margin-top: 5px; height: 33px; }
 .HHBoxWakeUp { width: 38%; margin-left: 2%; margin-top: 5px; height: 33px; }
-.HHPlanning {position: fixed;overflow: auto; top: -100%; left: 10%; width: 80%; height: 80%; background-color: rgba(37, 37, 37, 1); z-index: 10000; transition:top .5s ease-out;box-shadow: 0 8px 8px rgba(0,0,0,1)}
+.HHPlanning {position: fixed;overflow: auto; top: -100%; left: 10%; width: 80%; height: 80%; background-color: rgba(37, 37, 37, 1); z-index: 10000; transition:top .5s ease-out;box-shadow: 0 4px 8px rgba(0,0,0,0.5)}
 .glyphicon-off { top: 2px !important; }
 .progress { height: 5px; width: 90%; margin-left: 5px; opacity: 0; margin-bottom: 0px; margin-top: -1px; }
 .HHBox .slider-selection { background: #BABABA; }
@@ -17,4 +17,6 @@ body { padding-left: 10px; padding-top: 70px; background-color: rgba(37, 37, 37,
 #addAction {position: absolute; top: 5px; right: 5px;font-size: 20px}
 .HHPlanning .header {position: fixed; height: 30px; width: 80%; z-index: 10}
 .HHPlanning .add {margin-top:45px;display: none; color: white; text-align: center}
-.HHPlanning .add .form-control {width: 40%; display: inline-block;}
+.HHPlanning .add .form-control {width: 36%; display: inline-block;}
+li a:focus, li a:hover {color: #428bca !important; background: none !important}
+li.active a:focus, li.active a:hover {color: #fff !important; background-color: #428bca !important}

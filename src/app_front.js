@@ -42,21 +42,36 @@
         }.bind(this));
     };
 
+    HomeHue.prototype.getTemplate = function() {
+        try{
+            this.template = {
+                box: $(".HHBox").get(0),
+                planning: {
+                    container: $(".HHPlanning"),
+                    closeButton: $(".HHPlanning #closePlanning"),
+                    addButton: $(".HHPlanning #addAction"),
+                    addContainer: $(".HHPlanning .add"),
+                    actions: $(".HHPlanning .chooseAction li"),
+                    lights: $(".HHPlanning .chooseLight li"),
+                    days: $(".chooseDay li"),
+                    hours: $(".chooseHours"),
+                    minutes: $(".chooseMinutes"),
+                    eachButton: $(".chooseRecurent"),
+                    onceButton: $(".chooseOnce")
+                }
+            };
+
+            $(".HHBox").remove();
+        } catch (e) {
+            this.log("HomeHue Error: getTemplate -->", e);
+        }
+    };
+
     HomeHue.prototype.initFormUserInfo = function() {
         $(".inputForm").tooltip({container: "body"}); //active tooltip for input form
         $(".buttonForm").tooltip({container: "body"}); //active tooltip for button form
         $("#BtnTestAndSave").on("click", this.testAndSaveUserInfo.bind(this));
         $("#BtnPlanning").on("click", this.showPlanning.bind(this));
-    };
-
-    HomeHue.prototype.initPlanning = function() {
-        $(".HHPlanning #closePlanning").click(function() {
-            $(this.template.planning).css("top", "-100%");
-        }.bind(this));
-        $(".HHPlanning #addAction").click(function() {
-            $(this).hide();
-            $(".HHPlanning .add").show();
-        });
     };
 
     HomeHue.prototype.getUserInfo = function() {
@@ -104,28 +119,83 @@
         }
     };
 
+    HomeHue.prototype.initPlanning = function() {
+        var t = this.template.planning;
+        // close planning
+        t.closeButton.click(this.closePlanning.bind(this));
+        // click on add action button (+)
+        t.addButton.click(function() {
+            t.addButton.hide();
+            t.addContainer.show();
+        });
+        // click on action (just one)
+        t.actions.click(function(e) {
+            e.preventDefault();
+            t.actions.removeClass("active");
+            $(this).addClass("active");
+        });
+        // click on other option (multiple allowed)
+        var chooseClass = function(e) {
+            e.preventDefault();
+            if ($(this).hasClass("active")) {
+                $(this).removeClass("active");
+            } else {
+                $(this).addClass("active");
+            }
+        };
+        t.lights.click(chooseClass);
+        t.days.click(chooseClass);
+        t.onceButton.click(this.addActionToPlanning.bind(this, true));
+        t.eachButton.click(this.addActionToPlanning.bind(this, false));
+    };
+
     HomeHue.prototype.showPlanning = function() {
-        $(this.template.planning).css("top", "10%");
+        $(".HHBox").hide();
         $(".navbar-toggle").click();
+        this.template.planning.container.css("top", "15%");
 
         var now = new Date();
 
-        $(".addActionHours").get(0).selectedIndex = now.getHours();
-        $(".addActionMinutes").get(0).selectedIndex = now.getMinutes();
-        $($(".addActionDay li")[now.getDay()]).addClass("active");
+        this.template.planning.hours.get(0).selectedIndex = now.getHours();
+        this.template.planning.minutes.get(0).selectedIndex = now.getMinutes();
+        $(this.template.planning.days[now.getDay()]).addClass("active");
     };
 
-    HomeHue.prototype.getTemplate = function() {
-        try{
-            this.template = {
-                box: $(".HHBox").get(0),
-                planning: $(".HHPlanning").get(0)
-            };
+    HomeHue.prototype.addActionToPlanning = function(once) {
+        var action, lights = "", days = "",
+        hours = this.template.planning.hours.get(0).selectedIndex,
+        minutes = this.template.planning.minutes.get(0).selectedIndex;
 
-            $(".HHBox").remove();
-        } catch (e) {
-            this.log("HomeHue Error: getTemplate -->", e);
-        }
+        // get action id
+        this.template.planning.actions.each(function(index, obj) {
+            if ($(obj).hasClass("active")) {
+                action = obj.id.replace("action", "");
+            }
+        });
+
+        // get lights id
+        this.template.planning.lights.each(function(index, obj) {
+            if ($(obj).hasClass("active")) {
+                lights += obj.id.replace("light", "") + "-";
+            }
+        });
+
+        // get days id
+        this.template.planning.days.each(function(index, obj) {
+            if ($(obj).hasClass("active")) {
+                days += obj.id.replace("day", "");
+            }
+        });
+
+        console.log("/addToPlan/" + days + "-" + hours + "-" + minutes + "/" + action + "/" + lights + "/" + (+once));
+        $.get("/addToPlan/" + days + "-" + hours + "-" + minutes + "/" + action + "/" + lights + "/" + (+once), null, null);
+    };
+
+    HomeHue.prototype.closePlanning = function() {
+        $(".HHBox").show();
+        this.template.planning.container.css("top", "-100%");
+        this.template.planning.addButton.show();
+        this.template.planning.addContainer.hide();
     };
 
     HomeHue.prototype.getHue = function() {
