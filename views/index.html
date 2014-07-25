@@ -60,11 +60,11 @@
                     </div>
                     <div class="input-group">
                         <input type="text" class="form-control inputForm" id="inputSleepDuration" placeholder="SLEEP DURATION" data-toggle="tooltip" data-placement="top" title="SLEEP DURATION">
-                        <span class="input-group-addon">ms</span>
+                        <span class="input-group-addon">s</span>
                     </div>
                     <div class="input-group">
                         <input type="text" class="form-control inputForm" id="inputWakeUpDuration" placeholder="WAKE UP DURATION" data-toggle="tooltip" data-placement="top" title="WAKE UP DURATION">
-                        <span class="input-group-addon">ms</span>
+                        <span class="input-group-addon">s</span>
                     </div>
                     <br/>
                     <button type="button" class="btn btn-warning" id="BtnPlanning">PLANNING</button>
@@ -104,11 +104,12 @@
             <span class="glyphicon glyphicon-remove-circle text-danger" id="closePlanning"></span>
             <span class="glyphicon glyphicon-plus text-success" id="addAction"></span>
         </div>
+        <div class="list"></div>
         <div class="add">
             <h3>I want to</h3>
             <ul class="nav nav-pills nav-stacked chooseAction">
-              <li class="active" id="action1"><a href="#">Turn on</a></li>
-              <li id="action0"><a href="#">Turn off</a></li>
+              <li class="active" id="action0"><a href="#">Turn off</a></li>
+              <li id="action1"><a href="#">Turn on</a></li>
               <li id="action2"><a href="#">Wake up</a></li>
               <li id="action3"><a href="#">Go sleep</a></li>
             </ul>

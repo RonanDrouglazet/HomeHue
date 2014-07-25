@@ -24,6 +24,11 @@ homehue.get("/state", getServerState)
     });
 })
 
+.get("/planning", function(req, res) {
+    res.write(JSON.stringify(planning));
+    res.send();
+})
+
 /*
  * STATIC and 404
  */

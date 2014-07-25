@@ -17,7 +17,9 @@
             STATE: "/light/:id",
             SLEEP: "/transition/sleep/:id",
             WAKEUP: "/transition/wakeup/:id",
-            SERVER_INFO: "/serverInfo"
+            SERVER_INFO: "/serverInfo",
+            ADD_TO_PLAN: "/addToPlan/:day-:hour-:minute/:action/:lights/:once",
+            UPDATE_PLANNING: "/planning"
         };
     };
 
@@ -50,6 +52,7 @@
                     container: $(".HHPlanning"),
                     closeButton: $(".HHPlanning #closePlanning"),
                     addButton: $(".HHPlanning #addAction"),
+                    listContainer: $(".HHPlanning .list"),
                     addContainer: $(".HHPlanning .add"),
                     actions: $(".HHPlanning .chooseAction li"),
                     lights: $(".HHPlanning .chooseLight li"),
@@ -79,8 +82,8 @@
             var d = JSON.parse(data);
             $("#inputHueIp").get(0).value = d.hue_ip;
             $("#inputUserName").get(0).value = d.user_name;
-            $("#inputSleepDuration").get(0).value = d.duration_sleep;
-            $("#inputWakeUpDuration").get(0).value = d.duration_wakeup;
+            $("#inputSleepDuration").get(0).value = d.duration_sleep / 1000;
+            $("#inputWakeUpDuration").get(0).value = d.duration_wakeup / 1000;
         });
     };
 
@@ -104,7 +107,12 @@
                         $("#alertUserInfo").html(data[0].error.description).show();
                     } else {
                     //all info are ok
-                        $.get(this.HUE_CONST.SERVER_INFO, {"hue_ip": hue, "user_name": userName, "duration_sleep": sleepDuration, "duration_wakeup": wakeUpDuration}, function(){ window.location.reload(); })
+                        $.get(this.HUE_CONST.SERVER_INFO, {
+                            "hue_ip": hue,
+                            "user_name": userName,
+                            "duration_sleep": sleepDuration * 1000,
+                            "duration_wakeup": wakeUpDuration * 1000
+                        }, function(){ window.location.reload(); })
                         .fail(function() {
                             $("#alertUserInfo").html("server error, please try again").show();
                         });
@@ -157,12 +165,13 @@
         var now = new Date();
 
         this.template.planning.hours.get(0).selectedIndex = now.getHours();
-        this.template.planning.minutes.get(0).selectedIndex = now.getMinutes();
+        this.template.planning.minutes.get(0).selectedIndex = now.getMinutes() + 1;
         $(this.template.planning.days[now.getDay()]).addClass("active");
+        this.updatePlanning();
     };
 
     HomeHue.prototype.addActionToPlanning = function(once) {
-        var action, lights = "", days = "",
+        var action, lights = "", days = "", actionUrl,
         hours = this.template.planning.hours.get(0).selectedIndex,
         minutes = this.template.planning.minutes.get(0).selectedIndex;
 
@@ -187,8 +196,52 @@
             }
         });
 
-        console.log("/addToPlan/" + days + "-" + hours + "-" + minutes + "/" + action + "/" + lights + "/" + (+once));
-        $.get("/addToPlan/" + days + "-" + hours + "-" + minutes + "/" + action + "/" + lights + "/" + (+once), null, null);
+        actionUrl = this.HUE_CONST.ADD_TO_PLAN
+            .replace(":day", days)
+            .replace(":hour", hours)
+            .replace(":minute", minutes)
+            .replace(":action", action)
+            .replace(":lights", lights)
+            .replace(":once", (+once))
+            .replace(/-\//ig, "/");
+
+        console.log(actionUrl);
+        $.get(actionUrl, null, null);
+
+        this.template.planning.addContainer.hide();
+        this.template.planning.addButton.show();
+        this.updatePlanning();
+    };
+
+    HomeHue.prototype.updatePlanning = function() {
+        $.get(this.HUE_CONST.UPDATE_PLANNING, null, function(data) {
+            if (data) {
+                var d = JSON.parse(data);
+                this.template.planning.listContainer.html("<h3>Once</h3><ul class='list-group once'></ul><h3>Recurent</h3><ul class='list-group recurent'></ul>");
+
+                d.forEach(function(obj, index) {
+                    console.log($(this.template.planning.actions[obj.action]));
+                    var action = " " + $(this.template.planning.actions[obj.action]).children("a").html();
+                    var lights = " ";
+                    var days = "On ";
+                    var time = (obj.hour < 10 ? "0" + obj.hour : obj.hour) + ":" + (obj.minute < 10 ? "0" + obj.minute : obj.minute);
+
+                    obj.day.split().forEach(function(day, index) {
+                        var sep = (index === obj.day.split().length - 1) ? "" : "-";
+                        days += $(this.template.planning.days[parseInt(day)]).children("a").html() + sep;
+                    }.bind(this));
+
+                    obj.lights.forEach(function(light, index) {
+                        var sep = (index === obj.lights.length - 1) ? "" : ", ";
+                        lights += $("#light" + light).children("a").html() + sep;
+                    }.bind(this));
+
+                    this.template.planning.listContainer.children(obj.once ? ".once" : ".recurent").append(
+                        "<li class='list-group-item'>" + days + action + lights + "<span class='badge'>" + time +"</span>" + "</li>"
+                    );
+                }.bind(this));
+            }
+        }.bind(this));
     };
 
     HomeHue.prototype.closePlanning = function() {
