@@ -230,11 +230,12 @@
             .replace(":once", (+once))
             .replace(/-\//ig, "/");
 
-        $.get(actionUrl, null, null);
+        $.get(actionUrl, null, function() {
+            this.updatePlanning();
+        }.bind(this));
 
         this.template.planning.addContainer.hide();
         this.template.planning.addButton.show();
-        this.updatePlanning();
     };
 
     HomeHue.prototype.updatePlanning = function() {

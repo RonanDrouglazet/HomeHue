@@ -123,7 +123,9 @@ function serverInfo(req, res) {
         for (var i in req.query) {
             serverConf[i] = req.query[i];
         }
-        writeServerConf();
+        writeServerConf(function() {
+            res.send();
+        });
     } else {
         getServerConf(function(data) {
             res.write(JSON.stringify(data));
@@ -132,8 +134,12 @@ function serverInfo(req, res) {
     }
 }
 
-function writeServerConf() {
-    fs.writeFile("Server.conf", JSON.stringify(serverConf), null);
+function writeServerConf(done) {
+    fs.writeFile("Server.conf", JSON.stringify(serverConf), function(err) {
+        if (done) {
+            done(err);
+        }
+    });
 }
 
 /*
@@ -276,8 +282,9 @@ function addActionOnPlanning(req, res) {
         once: !!parseInt(req.params.once)
     });
 
-    writeServerConf();
-    res.send();
+    writeServerConf(function() {
+        res.send();
+    });
 }
 
 function removeActionOnPlanning(req, res) {
