@@ -25,7 +25,7 @@
 
     HomeHue.prototype.init = function() {
         //get server state before all
-        $.get(this.HUE_CONST.SERVER_STATE, null, function(data) {
+        $.get(this.HUE_CONST.SERVER_STATE + "?" + Date.now(), null, function(data) {
             var d = JSON.parse(data);
 
             this.getTemplate();
@@ -91,7 +91,7 @@
     };
 
     HomeHue.prototype.getUserInfo = function() {
-        $.get(this.HUE_CONST.SERVER_INFO, null, function(data) {
+        $.get(this.HUE_CONST.SERVER_INFO  + "?" + Date.now(), null, function(data) {
             var d = JSON.parse(data);
             this.template.form.hueIp.get(0).value = d.hue_ip;
             this.template.form.userName.get(0).value = d.user_name;
@@ -120,7 +120,7 @@
                         this.template.form.alertUser.html(data[0].error.description).show();
                     } else {
                     //all info are ok
-                        $.get(this.HUE_CONST.SERVER_INFO, {
+                        $.get(this.HUE_CONST.SERVER_INFO + "?" + Date.now(), {
                             "hue_ip": hue,
                             "user_name": userName,
                             "duration_sleep": sleepDuration * 1000,
@@ -230,7 +230,7 @@
             .replace(":once", (+once))
             .replace(/-\//ig, "/");
 
-        $.get(actionUrl, null, function() {
+        $.get(actionUrl + "?" + Date.now(), null, function() {
             this.updatePlanning();
         }.bind(this));
 
@@ -239,7 +239,7 @@
     };
 
     HomeHue.prototype.updatePlanning = function() {
-        $.get(this.HUE_CONST.UPDATE_PLANNING, null, function(data) {
+        $.get(this.HUE_CONST.UPDATE_PLANNING + "?" + Date.now(), null, function(data) {
             if (data) {
                 var d = JSON.parse(data);
                 this.template.planning.listContainer.html("<h3>Once</h3><ul class='list-group once'></ul><h3>Recurent</h3><ul class='list-group recurent'></ul>");
@@ -267,7 +267,7 @@
 
                 var _this = this;
                 $(".glyphicon-remove").click(function() {
-                    $.get("/removeFromPlan/" + parseInt(this.id), null, function(data) {
+                    $.get("/removeFromPlan/" + parseInt(this.id) + "?" + Date.now(), null, function(data) {
                         _this.updatePlanning();
                     });
                 });
