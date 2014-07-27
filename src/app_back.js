@@ -11,6 +11,7 @@ homehue.get("/state", getServerState)
 .get("/serverInfo", serverInfo)
 .get("/allLight", getAllLightStatus)
 .get("/addToPlan/:date/:action/:lights/:once", addActionOnPlanning)
+.get("/removeFromPlan/:id", removeActionOnPlanning)
 
 .get("/transition/:type/:id", function(req, res) {
     lightTransition(req.params.type, req.params.id);
@@ -25,7 +26,7 @@ homehue.get("/state", getServerState)
 })
 
 .get("/planning", function(req, res) {
-    res.write(JSON.stringify(planning));
+    res.write(JSON.stringify(serverConf.planning));
     res.send();
 })
 
@@ -44,8 +45,7 @@ homehue.get("/state", getServerState)
 // ==================================================
 
 var transitions = {};
-var planning = [];
-var userConf = null;
+var serverConf = null;
 var hue = {
     SLEEP: "sleep",
     SLEEP_INC: -1,
@@ -120,19 +120,20 @@ function getAllLightStatus(req, res) {
  */
 function serverInfo(req, res) {
     if (req.query.hue_ip) {
-        fs.writeFile("Server.conf", JSON.stringify(req.query), function (err) {
-            if (err) {
-                res.send(404);
-                throw err;
-            }
-            res.send();
-        });
+        for (var i in req.query) {
+            serverConf[i] = req.query[i];
+        }
+        writeServerConf();
     } else {
         getServerConf(function(data) {
             res.write(JSON.stringify(data));
             res.send();
         });
     }
+}
+
+function writeServerConf() {
+    fs.writeFile("Server.conf", JSON.stringify(serverConf), null);
 }
 
 /*
@@ -153,7 +154,7 @@ function getServerState(req, res) {
  * Read server configuration
  */
 function getServerConf(callback, force) {
-    if (!userConf || force) {
+    if (!serverConf || force) {
         fs.exists("Server.conf", function(exists) {
             if (exists) {
                 fs.readFile("Server.conf", function (err, data) {
@@ -161,10 +162,14 @@ function getServerConf(callback, force) {
                         throw err;
                     }
 
-                    userConf =  JSON.parse(data);
+                    serverConf =  JSON.parse(data);
+
+                    if (!serverConf.planning) {
+                        serverConf.planning = [];
+                    }
 
                     if (callback) {
-                        callback(userConf);
+                        callback(serverConf);
                     }
                 });
             } else {
@@ -172,7 +177,7 @@ function getServerConf(callback, force) {
             }
         });
     } else if (callback) {
-        callback(userConf);
+        callback(serverConf);
     }
 }
 
@@ -190,10 +195,10 @@ function lightTransition(type, id) {
             //if not exist, create it
             if (!transitions[id]) {
                 transitions[id] = {
-                    time: (type === hue.SLEEP) ? parseInt(userConf.duration_sleep) : parseInt(userConf.duration_wakeup)
+                    time: (type === hue.SLEEP) ? parseInt(serverConf.duration_sleep) : parseInt(serverConf.duration_wakeup)
                 };
             } else {
-                transitions[id].time = (type === hue.SLEEP) ? parseInt(userConf.duration_sleep) : parseInt(userConf.duration_wakeup);
+                transitions[id].time = (type === hue.SLEEP) ? parseInt(serverConf.duration_sleep) : parseInt(serverConf.duration_wakeup);
             }
 
             //if already running, stop it
@@ -262,7 +267,7 @@ function createLightTransition(type, lightId, transitions) {
 function addActionOnPlanning(req, res) {
     var date = req.params.date.split("-");
 
-    planning.push({
+    serverConf.planning.push({
         day: date[0],
         hour: parseInt(date[1]),
         minute: parseInt(date[2]),
@@ -271,8 +276,15 @@ function addActionOnPlanning(req, res) {
         once: !!parseInt(req.params.once)
     });
 
+    writeServerConf();
     res.send();
-    //TODO, if action are recurent, append it on Server.conf
+}
+
+function removeActionOnPlanning(req, res) {
+    var index = parseInt(req.params.id);
+    serverConf.planning.splice(index--, 1);
+    writeServerConf();
+    res.send();
 }
 
 function doPlannedAction(plan, index) {
@@ -294,13 +306,15 @@ function doPlannedAction(plan, index) {
 
     // if once, remove it from planning
     if (plan.once) {
-        planning.splice(index--, 1);
+        serverConf.planning.splice(index--, 1);
     }
+
+    writeServerConf();
 }
 
 function checkForPlannedAction() {
     var now = new Date();
-    planning.forEach(function(plan, index) {
+    serverConf.planning.forEach(function(plan, index) {
         if (plan.day.indexOf(now.getDay().toString()) !== -1 &&
             plan.hour === now.getHours() &&
             plan.minute === now.getMinutes()) {
@@ -325,10 +339,10 @@ initPlanning();
  * Create hue request with success callback
  */
 function createHueLightRequest (method, path, body, success) {
-    if (userConf) {
+    if (serverConf) {
         var options = {
-          hostname: userConf.hue_ip,
-          path: "/api/" + userConf.user_name + "/lights/" + (path ? path : ""),
+          hostname: serverConf.hue_ip,
+          path: "/api/" + serverConf.user_name + "/lights/" + (path ? path : ""),
           method: method
         };
 

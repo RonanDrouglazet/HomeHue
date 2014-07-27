@@ -48,6 +48,19 @@
         try{
             this.template = {
                 box: $(".HHBox").get(0),
+                form: {
+                    inputs: $(".inputForm"),
+                    buttons: $(".buttonForm"),
+                    btnSave: $("#BtnTestAndSave"),
+                    btnPlanning: $("#BtnPlanning"),
+                    hueIp: $("#inputHueIp"),
+                    userName: $("#inputUserName"),
+                    sleepDuration: $("#inputSleepDuration"),
+                    wakeUpDuration: $("#inputWakeUpDuration"),
+                    alert: $(".alert"),
+                    alertForm: $("#alertFormMissField"),
+                    alertUser: $("#alertUserInfo")
+                },
                 planning: {
                     container: $(".HHPlanning"),
                     closeButton: $(".HHPlanning #closePlanning"),
@@ -71,40 +84,40 @@
     };
 
     HomeHue.prototype.initFormUserInfo = function() {
-        $(".inputForm").tooltip({container: "body"}); //active tooltip for input form
-        $(".buttonForm").tooltip({container: "body"}); //active tooltip for button form
-        $("#BtnTestAndSave").on("click", this.testAndSaveUserInfo.bind(this));
-        $("#BtnPlanning").on("click", this.showPlanning.bind(this));
+        this.template.form.inputs.tooltip({container: "body"}); //active tooltip for input form
+        this.template.form.buttons.tooltip({container: "body"}); //active tooltip for button form
+        this.template.form.btnSave.on("click", this.testAndSaveUserInfo.bind(this));
+        this.template.form.btnPlanning.on("click", this.showPlanning.bind(this));
     };
 
     HomeHue.prototype.getUserInfo = function() {
         $.get(this.HUE_CONST.SERVER_INFO, null, function(data) {
             var d = JSON.parse(data);
-            $("#inputHueIp").get(0).value = d.hue_ip;
-            $("#inputUserName").get(0).value = d.user_name;
-            $("#inputSleepDuration").get(0).value = d.duration_sleep / 1000;
-            $("#inputWakeUpDuration").get(0).value = d.duration_wakeup / 1000;
-        });
+            this.template.form.hueIp.get(0).value = d.hue_ip;
+            this.template.form.userName.get(0).value = d.user_name;
+            this.template.form.sleepDuration.get(0).value = d.duration_sleep / 1000;
+            this.template.form.wakeUpDuration.get(0).value = d.duration_wakeup / 1000;
+        }.bind(this));
     };
 
     HomeHue.prototype.testAndSaveUserInfo = function() {
-        var hue = $("#inputHueIp").get(0).value.replace("http://", ""),
-        userName = $("#inputUserName").get(0).value,
-        sleepDuration = $("#inputSleepDuration").get(0).value,
-        wakeUpDuration = $("#inputWakeUpDuration").get(0).value;
+        var hue = this.template.form.hueIp.get(0).value.replace("http://", ""),
+        userName = this.template.form.userName.get(0).value,
+        sleepDuration = this.template.form.sleepDuration.get(0).value,
+        wakeUpDuration = this.template.form.wakeUpDuration.get(0).value;
         $.ajaxSetup({ timeout: 1000 }); //set request timeout to 1000ms
-        $(".alert").hide();
+        this.template.form.alert.hide();
 
         if (hue === "" || userName === "" || sleepDuration === "" || wakeUpDuration === "") {
-            $("#alertFormMissField").show();
+            this.template.form.alertForm.show();
         } else if (isNaN(sleepDuration) || isNaN(wakeUpDuration)) {
-            $("#alertFormMissField").html("sleep / wake up duration must be a number").show();
+            this.template.form.alertForm.html("sleep / wake up duration must be a number").show();
         } else {
             try {
                 $.get("http://" + hue + "/api/" + userName, null, function(data) {
                     //we receive an array, so it's an error
                     if (data.length && data[0].error) {
-                        $("#alertUserInfo").html(data[0].error.description).show();
+                        this.template.form.alertUser.html(data[0].error.description).show();
                     } else {
                     //all info are ok
                         $.get(this.HUE_CONST.SERVER_INFO, {
@@ -114,21 +127,32 @@
                             "duration_wakeup": wakeUpDuration * 1000
                         }, function(){ window.location.reload(); })
                         .fail(function() {
-                            $("#alertUserInfo").html("server error, please try again").show();
+                            this.template.form.alertUser.html("server error, please try again").show();
                         });
                     }
                 }.bind(this)).fail(function() {
                 //request fail, hue ip are not ok
-                    $("#alertUserInfo").html("fail to contact hue at http://" + hue).show();
-                });
+                    this.template.form.alertUser.html("fail to contact hue at http://" + hue).show();
+                }.bind(this));
             } catch (e) {
-                $("#alertUserInfo").html("fail to contact hue at http://" + hue).show();
+                this.template.form.alertUser.html("fail to contact hue at http://" + hue).show();
             }
         }
     };
 
     HomeHue.prototype.initPlanning = function() {
         var t = this.template.planning;
+
+        // get all lights from hue and fill "add action on planning" with lights
+        this.get(function(data) {
+            var d = JSON.parse(data);
+            for (var id in d) {
+                var active = id === "1" ? "active" : "";
+                $(".HHPlanning .chooseLight").append("<li class='" + active + "' id='light" + id + "'><a href='#'>" + d[id].name + "</a></li>");
+            }
+            t.lights = $(".HHPlanning .chooseLight li");
+            t.lights.click(chooseClass);
+        });
         // close planning
         t.closeButton.click(this.closePlanning.bind(this));
         // click on add action button (+)
@@ -151,7 +175,7 @@
                 $(this).addClass("active");
             }
         };
-        t.lights.click(chooseClass);
+
         t.days.click(chooseClass);
         t.onceButton.click(this.addActionToPlanning.bind(this, true));
         t.eachButton.click(this.addActionToPlanning.bind(this, false));
@@ -196,6 +220,7 @@
             }
         });
 
+        // create action url from params
         actionUrl = this.HUE_CONST.ADD_TO_PLAN
             .replace(":day", days)
             .replace(":hour", hours)
@@ -205,7 +230,6 @@
             .replace(":once", (+once))
             .replace(/-\//ig, "/");
 
-        console.log(actionUrl);
         $.get(actionUrl, null, null);
 
         this.template.planning.addContainer.hide();
@@ -220,14 +244,13 @@
                 this.template.planning.listContainer.html("<h3>Once</h3><ul class='list-group once'></ul><h3>Recurent</h3><ul class='list-group recurent'></ul>");
 
                 d.forEach(function(obj, index) {
-                    console.log($(this.template.planning.actions[obj.action]));
                     var action = " " + $(this.template.planning.actions[obj.action]).children("a").html();
                     var lights = " ";
                     var days = "On ";
                     var time = (obj.hour < 10 ? "0" + obj.hour : obj.hour) + ":" + (obj.minute < 10 ? "0" + obj.minute : obj.minute);
 
-                    obj.day.split().forEach(function(day, index) {
-                        var sep = (index === obj.day.split().length - 1) ? "" : "-";
+                    obj.day.split("").forEach(function(day, index) {
+                        var sep = (index === obj.day.split("").length - 1) ? "" : "-";
                         days += $(this.template.planning.days[parseInt(day)]).children("a").html() + sep;
                     }.bind(this));
 
@@ -237,9 +260,16 @@
                     }.bind(this));
 
                     this.template.planning.listContainer.children(obj.once ? ".once" : ".recurent").append(
-                        "<li class='list-group-item'>" + days + action + lights + "<span class='badge'>" + time +"</span>" + "</li>"
+                        "<li class='list-group-item'><span class='glyphicon glyphicon-remove' id='" + index + "_plan'></span> " + days + action + lights + "<span class='badge'>" + time +"</span>" + "</li>"
                     );
                 }.bind(this));
+
+                var _this = this;
+                $(".glyphicon-remove").click(function() {
+                    $.get("/removeFromPlan/" + parseInt(this.id), null, function(data) {
+                        _this.updatePlanning();
+                    });
+                });
             }
         }.bind(this));
     };

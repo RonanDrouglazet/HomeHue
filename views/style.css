@@ -20,5 +20,7 @@ body { padding-left: 10px; padding-top: 70px; background-color: rgba(37, 37, 37,
 .HHPlanning .add .form-control {width: 36%; display: inline-block;}
 .HHPlanning .list {width: 100%; top:10px; position: absolute;}
 .HHPlanning .list h3 {color: white; text-align: center;}
+.HHPlanning .list .list-group-item {padding: 10px 5px;}
+.HHPlanning .list .list-group-item .glyphicon {top: 2px;}
 li a:focus, li a:hover {color: #428bca !important; background: none !important}
 li.active a:focus, li.active a:hover {color: #fff !important; background-color: #428bca !important}
