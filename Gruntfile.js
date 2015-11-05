@@ -3,10 +3,6 @@ module.exports = function(grunt) {
         pkg: grunt.file.readJSON("package.json"),
         uglify: {
             front: {
-                options: {
-                    report: "gzip",
-                    sourceMap: true
-                },
                 files: {
                     "dist/app_front.min.js": ["src/app_front.js"]
                 }

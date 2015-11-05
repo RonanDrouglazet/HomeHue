@@ -273,25 +273,29 @@ function createLightTransition(type, lightId, transitions) {
 function addActionOnPlanning(req, res) {
     var date = req.params.date.split("-");
 
-    serverConf.planning.push({
-        day: date[0],
-        hour: parseInt(date[1]),
-        minute: parseInt(date[2]),
-        action: parseInt(req.params.action),
-        lights: req.params.lights.split("-"),
-        once: !!parseInt(req.params.once)
-    });
+    getServerConf(function(conf) {
+        conf.planning.push({
+            day: date[0],
+            hour: parseInt(date[1]),
+            minute: parseInt(date[2]),
+            action: parseInt(req.params.action),
+            lights: req.params.lights.split("-"),
+            once: !!parseInt(req.params.once)
+        });
 
-    writeServerConf(function() {
-        res.send();
+        writeServerConf(function() {
+            res.send();
+        });
     });
 }
 
 function removeActionOnPlanning(req, res) {
     var index = parseInt(req.params.id);
-    serverConf.planning.splice(index--, 1);
-    writeServerConf();
-    res.send();
+    getServerConf(function(conf) {
+        conf.planning.splice(index--, 1);
+        writeServerConf();
+        res.send();
+    });
 }
 
 function doPlannedAction(plan, index) {
@@ -313,21 +317,24 @@ function doPlannedAction(plan, index) {
 
     // if once, remove it from planning
     if (plan.once) {
-        serverConf.planning.splice(index--, 1);
+        getServerConf(function(conf) {
+            conf.planning.splice(index--, 1);
+            writeServerConf();
+        });
     }
-
-    writeServerConf();
 }
 
 function checkForPlannedAction() {
     var now = new Date();
-    serverConf.planning.forEach(function(plan, index) {
-        if (plan.day.indexOf(now.getDay().toString()) !== -1 &&
-            plan.hour === now.getHours() &&
-            plan.minute === now.getMinutes()) {
-            doPlannedAction(plan, index);
-        }
-    });
+    getServerConf(function(conf) {
+        conf.planning.forEach(function(plan, index) {
+            if (plan.day.indexOf(now.getDay().toString()) !== -1 &&
+                plan.hour === now.getHours() &&
+                plan.minute === now.getMinutes()) {
+                doPlannedAction(plan, index);
+            }
+        });
+    }); 
 }
 
 function initPlanning() {
@@ -346,10 +353,10 @@ initPlanning();
  * Create hue request with success callback
  */
 function createHueLightRequest (method, path, body, success) {
-    if (serverConf) {
+    getServerConf(function(conf) {
         var options = {
-          hostname: serverConf.hue_ip,
-          path: "/api/" + serverConf.user_name + "/lights/" + (path ? path : ""),
+          hostname: conf.hue_ip,
+          path: "/api/" + conf.user_name + "/lights/" + (path ? path : ""),
           method: method
         };
 
@@ -371,7 +378,7 @@ function createHueLightRequest (method, path, body, success) {
 
         req.write(body);
         req.end();
-    }
+    });
 }
 
 /*
