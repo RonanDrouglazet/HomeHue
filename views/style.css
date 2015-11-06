@@ -1,6 +1,7 @@
 body { padding-left: 10px; padding-top: 70px; background-color: rgba(37, 37, 37, 0.17); }
 .panel { width: 300px; margin-right: 10px; margin-top: 10px; background-color: #222; -webkit-box-shadow: 0 1px 1px rgba(0,0,0,.5); box-shadow: 0 1px 1px rgba(0,0,0,.5); opacity: 0; -webkit-transition: opacity 1s ease-out; transition: opacity 1s ease-out;}
-.HHBoxOnOff { width: 80%; margin-left: 20px; }
+.HHBoxOnOff, .HHBoxColor { width: 80%; margin-left: 20px;}
+.HHBoxColor { margin-top: 5px;}
 .HHBoxGoSleep { width: 38%; margin-left: 20px; margin-top: 5px; height: 33px; }
 .HHBoxWakeUp { width: 38%; margin-left: 2%; margin-top: 5px; height: 33px; }
 .HHPlanning {position: fixed;overflow: auto; top: -100%; left: 10%; width: 80%; height: 80%; background-color: rgba(37, 37, 37, 1); z-index: 10000; transition:top .5s ease-out;box-shadow: 0 4px 8px rgba(0,0,0,0.5)}
@@ -24,3 +25,22 @@ body { padding-left: 10px; padding-top: 70px; background-color: rgba(37, 37, 37,
 .HHPlanning .list .list-group-item .glyphicon {top: 2px;}
 li a:focus, li a:hover {color: #428bca !important; background: none !important}
 li.active a:focus, li.active a:hover {color: #fff !important; background-color: #428bca !important}
+#color-picker-wrapper {position: fixed; top: 0; left: 0; width: 100%; height: 25%; display: none; background: white; z-index: 10000}
+#color-picker-wrapper .close {position: absolute; left: 0.1em; font-size: 3em;}
+#color-picker-sat {
+	width: 80%; height: 10%; top: 5%; position: absolute; right: 0;
+	background: linear-gradient(to right,  #000000 0%,#ffffff 100%); /* W3C */
+}
+#color-picker {
+	position: absolute; bottom: 0; left: 0; width: 100%; height: 80%;
+	/* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#ff0000+0,ff00ff+14,0070c0+28,ffffff+50,92d050+61,ffb800+81,ff0000+100 */
+	background: #ff0000; /* Old browsers */
+	background: -moz-linear-gradient(left,  #ff0000 0%, #ff00ff 14%, #0070c0 28%, #ffffff 50%, #92d050 61%, #ffb800 81%, #ff0000 100%); /* FF3.6+ */
+	background: -webkit-gradient(linear, left top, right top, color-stop(0%,#ff0000), color-stop(14%,#ff00ff), color-stop(28%,#0070c0), color-stop(50%,#ffffff), color-stop(61%,#92d050), color-stop(81%,#ffb800), color-stop(100%,#ff0000)); /* Chrome,Safari4+ */
+	background: -webkit-linear-gradient(left,  #ff0000 0%,#ff00ff 14%,#0070c0 28%,#ffffff 50%,#92d050 61%,#ffb800 81%,#ff0000 100%); /* Chrome10+,Safari5.1+ */
+	background: -o-linear-gradient(left,  #ff0000 0%,#ff00ff 14%,#0070c0 28%,#ffffff 50%,#92d050 61%,#ffb800 81%,#ff0000 100%); /* Opera 11.10+ */
+	background: -ms-linear-gradient(left,  #ff0000 0%,#ff00ff 14%,#0070c0 28%,#ffffff 50%,#92d050 61%,#ffb800 81%,#ff0000 100%); /* IE10+ */
+	background: linear-gradient(to right,  #ff0000 0%,#ff00ff 14%,#0070c0 28%,#ffffff 50%,#92d050 61%,#ffb800 81%,#ff0000 100%); /* W3C */
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ff0000', endColorstr='#ff0000',GradientType=1 ); /* IE6-9 */
+}
+

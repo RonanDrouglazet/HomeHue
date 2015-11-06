@@ -31,6 +31,7 @@
             this.getTemplate();
             this.initFormUserInfo();
             this.initPlanning();
+            this.initColorPicker();
 
             if (d.running) {
                 //go init app
@@ -43,6 +44,10 @@
             }
         }.bind(this));
     };
+
+    /*
+     * TEMPLATE
+     */
 
     HomeHue.prototype.getTemplate = function() {
         try{
@@ -74,6 +79,11 @@
                     minutes: $(".chooseMinutes"),
                     eachButton: $(".chooseRecurent"),
                     onceButton: $(".chooseOnce")
+                },
+                colorPicker: {
+                    wrapper: $("#color-picker-wrapper"),
+                    wrapperColor: $("#color-picker"),
+                    close: $("#color-picker-wrapper .close")
                 }
             };
 
@@ -82,6 +92,10 @@
             this.log("HomeHue Error: getTemplate -->", e);
         }
     };
+
+    /*
+     * INIT FORM USER INFO / CONFIG
+     */
 
     HomeHue.prototype.initFormUserInfo = function() {
         this.template.form.inputs.tooltip({container: "body"}); //active tooltip for input form
@@ -139,6 +153,10 @@
             }
         }
     };
+
+    /*
+     * PLANNING
+     */
 
     HomeHue.prototype.initPlanning = function() {
         var t = this.template.planning;
@@ -282,6 +300,36 @@
         this.template.planning.addContainer.hide();
     };
 
+    /*
+     * COLOR PICKER
+     */
+
+    HomeHue.prototype.initColorPicker = function() {
+        this.template.colorPicker.close.click(function() {
+            this.template.colorPicker.wrapper.fadeOut();
+            this.template.colorPicker.wrapperColor.off('touchmove mouseup');
+        }.bind(this));
+    };
+
+    HomeHue.prototype.showColorPicker = function() {
+        this.app.template.colorPicker.wrapper.fadeIn();
+
+        this.app.template.colorPicker.wrapperColor.on('touchmove mouseup', function(e) {
+            this.app.colorPickerMove.bind(this)(e);
+        }.bind(this));
+    };
+
+    HomeHue.prototype.colorPickerMove = function(e) {
+        console.log(this.id, 65280 * (e.pageX / window.innerWidth));
+        this.app.set(null, this.id, {
+            "hue": 65280 - Math.floor(65280 * (e.pageX / window.innerWidth))
+        });
+    };
+
+    /*
+     * OTHER
+     */
+
     HomeHue.prototype.getHue = function() {
         this.get(function(data) {
             this.domUpdateHue(JSON.parse(data));
@@ -373,6 +421,7 @@
         this.boxGoSleepProgress = this.boxGoSleep.getElementsByClassName("progress-bar")[0];
         this.boxWakeUp = this.wrapper.getElementsByClassName("HHBoxWakeUp")[0];
         this.boxWakeUpProgress = this.boxWakeUp.getElementsByClassName("progress-bar")[0];
+        this.boxColor = this.wrapper.getElementsByClassName("HHBoxColor")[0];
         this.slider = this.wrapper.getElementsByTagName("input")[0];
         this.isSliding = false;
         this.intervalDraging = null;
@@ -385,6 +434,7 @@
         $(this.boxOnOff).on("click", this.app.setHueOnOff.bind(this));
         $(this.boxGoSleep).on("click", this.app.timerLight.bind(this, this.app.HUE_CONST.SLEEP));
         $(this.boxWakeUp).on("click", this.app.timerLight.bind(this, this.app.HUE_CONST.WAKEUP));
+        $(this.boxColor).on("click", this.app.showColorPicker.bind(this));
     };
 
     Box.prototype.append = function(parent) {
