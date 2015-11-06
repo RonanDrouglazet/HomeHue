@@ -26,9 +26,9 @@ body { padding-left: 10px; padding-top: 70px; background-color: rgba(37, 37, 37,
 li a:focus, li a:hover {color: #428bca !important; background: none !important}
 li.active a:focus, li.active a:hover {color: #fff !important; background-color: #428bca !important}
 #color-picker-wrapper {position: fixed; top: 0; left: 0; width: 100%; height: 25%; display: none; background: white; z-index: 10000; box-shadow: 0 4px 8px rgba(0,0,0,0.5)}
-#color-picker-wrapper .close {position: absolute; left: 0.1em; font-size: 3em;}
+#color-picker-wrapper .close {position: absolute; bottom: 0.1em; left: 0.1em; color: black; font-size: 3em; z-index: 2}
 #color-picker-sat {
-	width: 80%; height: 10%; top: 5%; position: absolute; right: 0;
+	width: 100%; height: 20%; top: 0; position: absolute; right: 0;
 	background: linear-gradient(to right,  #000000 0%,#ffffff 100%); /* W3C */
 }
 #color-picker {

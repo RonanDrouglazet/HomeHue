@@ -83,6 +83,7 @@
                 colorPicker: {
                     wrapper: $("#color-picker-wrapper"),
                     wrapperColor: $("#color-picker"),
+                    wrapperSat: $("#color-picker-sat"),
                     close: $("#color-picker-wrapper .close")
                 }
             };
@@ -308,6 +309,7 @@
         this.template.colorPicker.close.click(function() {
             this.template.colorPicker.wrapper.fadeOut();
             this.template.colorPicker.wrapperColor.off('touchmove mouseup');
+            this.template.colorPicker.wrapperSat.off('touchmove mouseup');
         }.bind(this));
     };
 
@@ -317,12 +319,21 @@
         this.app.template.colorPicker.wrapperColor.on('touchmove mouseup', function(e) {
             this.app.colorPickerMove.bind(this)(e);
         }.bind(this));
+
+        this.app.template.colorPicker.wrapperSat.on('touchmove mouseup', function(e) {
+            this.app.satPickerMove.bind(this)(e);
+        }.bind(this));
     };
 
     HomeHue.prototype.colorPickerMove = function(e) {
-        console.log(this.id, 65280 * (e.pageX / window.innerWidth));
         this.app.set(null, this.id, {
             "hue": 65280 - Math.floor(65280 * (e.pageX / window.innerWidth))
+        });
+    };
+
+    HomeHue.prototype.satPickerMove = function(e) {
+        this.app.set(null, this.id, {
+            "sat": 255 - Math.floor(255 * (e.pageX / window.innerWidth))
         });
     };
 
