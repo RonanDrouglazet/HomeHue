@@ -76,6 +76,12 @@
         </div>
     </div>
 
+    <div id="color-picker-wrapper">
+      <button type="button" class="close btn-lg" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+      <div id="color-picker-sat"></div>
+      <div id="color-picker"></div>
+    </div>
+
     <div class="HHBox panel panel-default pull-left">
       <div class="panel-body">
         <button type="button" class="HHBoxOnOff btn btn-success"><span class="pull-left">Chambre</span><span class="glyphicon glyphicon-off pull-right"></span></button>
@@ -95,7 +101,7 @@
                 </div>
             </div>
         </button><br/>
-        <button type="button" class="HHBoxColor btn">
+        <button type="button" class="HHBoxColor btn btn-primary">
             <span>COLOR</span>
         </button>
         <input data-slider-id='HHBoxSlider' type="text" data-slider-min="0" data-slider-max="255" data-slider-step="1" data-slider-value="255"/>
@@ -224,12 +230,6 @@
             <button type="button" class="btn btn-default chooseRecurent">Each week</button>&nbsp;&nbsp;
             <button type="button" class="btn btn-default chooseOnce">Just once</button><br/><br/>
         </div>
-    </div>
-
-    <div id="color-picker-wrapper">
-      <button type="button" class="close btn-lg" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-      <div id="color-picker-sat"></div>
-      <div id="color-picker"></div>
     </div>
 </body>
 
