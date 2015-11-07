@@ -10,6 +10,7 @@
         this.box = {};
         this.timerAppInterval = null;
         this.sleepInterval = null;
+        this.timerMove = null;
 
         this.HUE_CONST = {
             SERVER_STATE: "/state",
@@ -84,6 +85,8 @@
                     wrapper: $("#color-picker-wrapper"),
                     wrapperColor: $("#color-picker"),
                     wrapperSat: $("#color-picker-sat"),
+                    cursorColor: $(".cursor.bottom"),
+                    cursorSat: $(".cursor.top"),
                     close: $("#color-picker-wrapper .close")
                 }
             };
@@ -308,33 +311,59 @@
     HomeHue.prototype.initColorPicker = function() {
         this.template.colorPicker.close.click(function() {
             this.template.colorPicker.wrapper.fadeOut();
-            this.template.colorPicker.wrapperColor.off('touchmove mouseup');
-            this.template.colorPicker.wrapperSat.off('touchmove mouseup');
+           $(window).off('pointermove touchmove');
+           this.app.template.colorPicker.wrapperColor.off('pointerup touchend');
+           this.app.template.colorPicker.wrapperSat.off('pointerup touchend');
         }.bind(this));
     };
 
     HomeHue.prototype.showColorPicker = function() {
         this.app.template.colorPicker.wrapper.fadeIn();
 
-        this.app.template.colorPicker.wrapperColor.on('touchmove mouseup', function(e) {
+        $(window).on('pointermove touchmove', function(e) {
+            e.preventDefault();
             this.app.colorPickerMove.bind(this)(e);
         }.bind(this));
 
-        this.app.template.colorPicker.wrapperSat.on('touchmove mouseup', function(e) {
-            this.app.satPickerMove.bind(this)(e);
+        this.app.template.colorPicker.wrapperColor.on('pointerup touchend', function(e) {
+            this.app.colorPickerMove.bind(this)(e);
         }.bind(this));
+
+        this.app.template.colorPicker.wrapperSat.on('pointerup touchend', function(e) {
+            this.app.colorPickerMove.bind(this)(e);
+        }.bind(this));
+
+        this.app.get(function(light) {
+            var d = JSON.parse(light);
+            this.app.template.colorPicker.cursorColor.css('left', (window.innerWidth - ((d.state.hue * window.innerWidth) / 65280)) + 'px');
+            this.app.template.colorPicker.cursorSat.css('left', (window.innerWidth - ((d.state.sat * window.innerWidth) / 255)) + 'px');
+        }.bind(this), this.id);
     };
 
     HomeHue.prototype.colorPickerMove = function(e) {
-        this.app.set(null, this.id, {
-            "hue": 65280 - Math.floor(65280 * (e.pageX / window.innerWidth))
-        });
-    };
+        var data = {};
+        var _x = e.layerX || e.originalEvent.layerX;
 
-    HomeHue.prototype.satPickerMove = function(e) {
-        this.app.set(null, this.id, {
-            "sat": 255 - Math.floor(255 * (e.pageX / window.innerWidth))
-        });
+        if (_x) {
+            if (this.app.timerMove) {
+                clearTimeout(this.app.timerMove);
+                this.app.timerMove = null;
+            }
+
+            if (e.target.id === this.app.template.colorPicker.wrapperColor.attr('id') || e.target.className.indexOf('cursor bottom') === 0) {
+                data.hue = 65280 - Math.floor(65280 * (_x / window.innerWidth));
+                this.app.template.colorPicker.cursorColor.css('left', (_x - 5) + 'px');
+            } else if (e.target.id === this.app.template.colorPicker.wrapperSat.attr('id') || e.target.className.indexOf('cursor top') === 0) {
+                data.sat = 255 - Math.floor(255 * (_x / window.innerWidth));
+                this.app.template.colorPicker.cursorSat.css('left', (_x - 5) + 'px');
+            }
+
+            if (data.sat || data.hue) {
+                this.app.timerMove = setTimeout(function() {
+                    this.app.set(null, this.id, data);
+                }.bind(this), 100);
+            }
+        }
     };
 
     /*

@@ -25,14 +25,14 @@ body { padding-left: 10px; padding-top: 70px; background-color: rgba(37, 37, 37,
 .HHPlanning .list .list-group-item .glyphicon {top: 2px;}
 li a:focus, li a:hover {color: #428bca !important; background: none !important}
 li.active a:focus, li.active a:hover {color: #fff !important; background-color: #428bca !important}
-#color-picker-wrapper {position: fixed; top: 0; left: 0; width: 100%; height: 25%; display: none; background: white; z-index: 10000; box-shadow: 0 4px 8px rgba(0,0,0,0.5)}
+#color-picker-wrapper {position: fixed; top: 0; left: 0; width: 100%; height: 30%; display: none; background: white; z-index: 10000; box-shadow: 0 4px 8px rgba(0,0,0,0.5)}
 #color-picker-wrapper .close {position: absolute; bottom: 0.1em; left: 0.1em; color: black; font-size: 3em; z-index: 2}
 #color-picker-sat {
-	width: 100%; height: 20%; top: 0; position: absolute; right: 0;
+	width: 100%; height: 30%; top: 0; position: absolute; right: 0;
 	background: linear-gradient(to right,  #000000 0%,#ffffff 100%); /* W3C */
 }
 #color-picker {
-	position: absolute; bottom: 0; left: 0; width: 100%; height: 80%;
+	position: absolute; bottom: 0; left: 0; width: 100%; height: 70%;
 	/* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#ff0000+0,ff00ff+14,0070c0+28,ffffff+50,92d050+61,ffb800+81,ff0000+100 */
 	background: #ff0000; /* Old browsers */
 	background: -moz-linear-gradient(left,  #ff0000 0%, #ff00ff 14%, #0070c0 28%, #ffffff 50%, #92d050 61%, #ffb800 81%, #ff0000 100%); /* FF3.6+ */
@@ -42,5 +42,12 @@ li.active a:focus, li.active a:hover {color: #fff !important; background-color: 
 	background: -ms-linear-gradient(left,  #ff0000 0%,#ff00ff 14%,#0070c0 28%,#ffffff 50%,#92d050 61%,#ffb800 81%,#ff0000 100%); /* IE10+ */
 	background: linear-gradient(to right,  #ff0000 0%,#ff00ff 14%,#0070c0 28%,#ffffff 50%,#92d050 61%,#ffb800 81%,#ff0000 100%); /* W3C */
 	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ff0000', endColorstr='#ff0000',GradientType=1 ); /* IE6-9 */
+}
+.cursor {
+	position: absolute;
+	width: 10px;
+	height: 100%;
+	border: 1px solid white;
+	box-shadow: 2px 2px 2px rgba(0,0,0,0.5);
 }
 
